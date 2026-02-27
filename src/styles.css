@@ -40,36 +40,36 @@ body {
 
 /* Success snackbar - green */
 .success-snackbar {
-  --mdc-snackbar-container-color: #43a047 !important;
-  --mdc-snackbar-supporting-text-color: white !important;
+  --mat-snackbar-container-color: #43a047 !important;
+  --mat-snackbar-supporting-text-color: white !important;
   --mat-mdc-snack-bar-button-color: white !important;
 }
 
 /* Error snackbar - red */
 .error-snackbar {
-  --mdc-snackbar-container-color: #d32f2f !important;
-  --mdc-snackbar-supporting-text-color: white !important;
+  --mat-snackbar-container-color: #d32f2f !important;
+  --mat-snackbar-supporting-text-color: white !important;
   --mat-mdc-snack-bar-button-color: white !important;
 }
 
 /* Warning snackbar - orange */
 .warning-snackbar {
-  --mdc-snackbar-container-color: #ff9800 !important;
-  --mdc-snackbar-supporting-text-color: white !important;
+  --mat-snackbar-container-color: #ff9800 !important;
+  --mat-snackbar-supporting-text-color: white !important;
   --mat-mdc-snack-bar-button-color: white !important;
 }
 
 /* Info snackbar - blue */
 .info-snackbar {
-  --mdc-snackbar-container-color: #4c6ef5 !important;
-  --mdc-snackbar-supporting-text-color: white !important;
+  --mat-snackbar-container-color: #4c6ef5 !important;
+  --mat-snackbar-supporting-text-color: white !important;
   --mat-mdc-snack-bar-button-color: white !important;
 }
 
 /* Default snackbar - dark gray */
 .default-snackbar {
-  --mdc-snackbar-container-color: #343a40 !important;
-  --mdc-snackbar-supporting-text-color: white !important;
+  --mat-snackbar-container-color: #343a40 !important;
+  --mat-snackbar-supporting-text-color: white !important;
   --mat-mdc-snack-bar-button-color: #4c6ef5 !important;
 }
 

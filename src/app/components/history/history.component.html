@@ -1,137 +1,132 @@
 <div class="history-container">
   <!-- Loading Indicator -->
-  <app-loading *ngIf="isLoading"></app-loading>
+  @if (isLoading) {
+    <app-loading></app-loading>
+  }
 
   <!-- Main Content -->
-  <div class="history-content" *ngIf="!isLoading">
-    <header class="history-header">
-      <h2 class="section-title">Workout History</h2>
-    </header>
-
-    <!-- Stats Section - Improved layout -->
-    <div class="stats-section">
-      <div class="stat-card">
-        <div class="stat-icon">
-          <i class="fas fa-dumbbell"></i>
+  @if (!isLoading) {
+    <div class="history-content">
+      <header class="history-header">
+        <h2 class="section-title">Workout History</h2>
+      </header>
+      <!-- Stats Section - Improved layout -->
+      <div class="stats-section">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-dumbbell"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value">{{ totalWorkouts }}</span>
+            <span class="stat-label">Total Workouts</span>
+          </div>
         </div>
-        <div class="stat-info">
-          <span class="stat-value">{{ totalWorkouts }}</span>
-          <span class="stat-label">Total Workouts</span>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value">{{ formatDuration(totalDuration) }}</span>
+            <span class="stat-label">Total Time</span>
+          </div>
         </div>
-      </div>
-      
-      <div class="stat-card">
-        <div class="stat-icon">
-          <i class="fas fa-clock"></i>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-bolt"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value">{{ formatDuration(averageWorkoutTime) }}</span>
+            <span class="stat-label">Avg. Workout</span>
+          </div>
         </div>
-        <div class="stat-info">
-          <span class="stat-value">{{ formatDuration(totalDuration) }}</span>
-          <span class="stat-label">Total Time</span>
-        </div>
-      </div>
-      
-      <div class="stat-card">
-        <div class="stat-icon">
-          <i class="fas fa-bolt"></i>
-        </div>
-        <div class="stat-info">
-          <span class="stat-value">{{ formatDuration(averageWorkoutTime) }}</span>
-          <span class="stat-label">Avg. Workout</span>
-        </div>
-      </div>
-      
-      <div class="stat-card">
-        <div class="stat-icon">
-          <i class="fas fa-calendar-check"></i>
-        </div>
-        <div class="stat-info">
-          <span class="stat-value">{{ mostActiveDay }}</span>
-          <span class="stat-label">Most Active Day</span>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-calendar-check"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value">{{ mostActiveDay }}</span>
+            <span class="stat-label">Most Active Day</span>
+          </div>
         </div>
       </div>
-    </div>
-
-    <!-- Calendar View - Cleaner version -->
-    <div class="calendar-section">
-      <div class="calendar-header">
-        <button class="btn-icon" (click)="changeMonth(-1)">
-          <i class="fas fa-chevron-left"></i>
-        </button>
-        <h3>{{ months[filterMonth] }} {{ filterYear }}</h3>
-        <button class="btn-icon" (click)="changeMonth(1)">
-          <i class="fas fa-chevron-right"></i>
-        </button>
-      </div>
-      
-      <div class="calendar-grid">
-        <div class="calendar-weekdays">
-          <div class="weekday">Mon</div>
-          <div class="weekday">Tue</div>
-          <div class="weekday">Wed</div>
-          <div class="weekday">Thu</div>
-          <div class="weekday">Fri</div>
-          <div class="weekday">Sat</div>
-          <div class="weekday">Sun</div>
+      <!-- Calendar View - Cleaner version -->
+      <div class="calendar-section">
+        <div class="calendar-header">
+          <button class="btn-icon" (click)="changeMonth(-1)">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <h3>{{ months[filterMonth] }} {{ filterYear }}</h3>
+          <button class="btn-icon" (click)="changeMonth(1)">
+            <i class="fas fa-chevron-right"></i>
+          </button>
         </div>
-        
-        <div class="calendar-days">
-          <ng-container *ngFor="let date of getDaysInMonth(filterMonth, filterYear)">
-            <div class="calendar-day" 
-                [class.current-month]="isCurrentMonth(date)" 
+        <div class="calendar-grid">
+          <div class="calendar-weekdays">
+            <div class="weekday">Mon</div>
+            <div class="weekday">Tue</div>
+            <div class="weekday">Wed</div>
+            <div class="weekday">Thu</div>
+            <div class="weekday">Fri</div>
+            <div class="weekday">Sat</div>
+            <div class="weekday">Sun</div>
+          </div>
+          <div class="calendar-days">
+            @for (date of getDaysInMonth(filterMonth, filterYear); track date) {
+              <div class="calendar-day"
+                [class.current-month]="isCurrentMonth(date)"
                 [class.today]="isToday(date)"
                 [class.has-activity]="getCalendarActivity(date)"
                 [class.activity-day]="getCalendarActivity(date)">
-              <span class="day-number">{{ date.getDate() }}</span>
-            </div>
-          </ng-container>
-        </div>
-      </div>
-    </div>
-
-    <!-- History List -->
-    <div class="history-list-section">
-      <h3 class="section-subtitle">Recent Workouts</h3>
-      
-      <div class="history-list" *ngIf="filteredHistory.length > 0; else noWorkouts">
-        <div class="history-item" *ngFor="let workout of filteredHistory">
-          <div class="history-item-header">
-            <div class="history-date">
-              <span class="day">{{ formatDate(workout.date) }}</span>
-              <span class="time">{{ formatDuration(workout.duration) }}</span>
-            </div>
-            
-            <div class="history-actions">
-              <button class="btn-icon" (click)="deleteWorkout(workout.id!)">
-                <i class="fas fa-trash-alt"></i>
-              </button>
-            </div>
-          </div>
-          
-          <div class="history-item-details">
-            <div class="history-detail">
-              <i class="fas fa-dumbbell"></i>
-              <span>{{ workout.day }} Workout</span>
-            </div>
-            
-            <div class="history-detail">
-              <i class="fas fa-check-circle"></i>
-              <span>{{ workout.exercises_completed }}/{{ workout.total_exercises }} Exercises</span>
-            </div>
-            
-            <div class="history-note" *ngIf="workout.notes">
-              <i class="fas fa-sticky-note"></i>
-              <span>{{ workout.notes }}</span>
-            </div>
+                <span class="day-number">{{ date.getDate() }}</span>
+              </div>
+            }
           </div>
         </div>
       </div>
-      
-      <ng-template #noWorkouts>
-        <div class="no-history">
-          <i class="fas fa-history"></i>
-          <p>No workout records for {{ months[filterMonth] }} {{ filterYear }}</p>
-        </div>
-      </ng-template>
+      <!-- History List -->
+      <div class="history-list-section">
+        <h3 class="section-subtitle">Recent Workouts</h3>
+        @if (filteredHistory.length > 0) {
+          <div class="history-list">
+            @for (workout of filteredHistory; track workout) {
+              <div class="history-item">
+                <div class="history-item-header">
+                  <div class="history-date">
+                    <span class="day">{{ formatDate(workout.date) }}</span>
+                    <span class="time">{{ formatDuration(workout.duration) }}</span>
+                  </div>
+                  <div class="history-actions">
+                    <button class="btn-icon" (click)="deleteWorkout(workout.id!)">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="history-item-details">
+                  <div class="history-detail">
+                    <i class="fas fa-dumbbell"></i>
+                    <span>{{ workout.day }} Workout</span>
+                  </div>
+                  <div class="history-detail">
+                    <i class="fas fa-check-circle"></i>
+                    <span>{{ workout.exercises_completed }}/{{ workout.total_exercises }} Exercises</span>
+                  </div>
+                  @if (workout.notes) {
+                    <div class="history-note">
+                      <i class="fas fa-sticky-note"></i>
+                      <span>{{ workout.notes }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="no-history">
+            <i class="fas fa-history"></i>
+            <p>No workout records for {{ months[filterMonth] }} {{ filterYear }}</p>
+          </div>
+        }
+      </div>
     </div>
-  </div>
+  }
 </div>

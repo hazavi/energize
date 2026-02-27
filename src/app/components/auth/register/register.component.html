@@ -1,23 +1,25 @@
-  <!-- Register Page -->
-  <div class="auth-container">
-    <div class="auth-box">
-      <h2 class="auth-title">Register</h2>
-      <p class="subtitle">Please fill in your information to register</p>
-      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">
-        <div class="form-group">
-          <label for="username">Username</label>
-          <div class="input-with-icon">
-            <span class="icon">
-              <i class="fa-solid fa-user"></i>
-            </span> 
-            <input type="text" id="username" formControlName="username" class="form-control"
-              placeholder="Enter username" required />
+<!-- Register Page -->
+<div class="auth-container">
+  <div class="auth-box">
+    <h2 class="auth-title">Register</h2>
+    <p class="subtitle">Please fill in your information to register</p>
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <div class="input-with-icon">
+          <span class="icon">
+            <i class="fa-solid fa-user"></i>
+          </span>
+          <input type="text" id="username" formControlName="username" class="form-control"
+            placeholder="Enter username" required />
           </div>
-          <div *ngIf="registerForm.get('username')?.invalid && (registerForm.get('username')?.dirty || registerForm.get('username')?.touched)" class="error-message">
-            Username must be at least 3 characters long.
-          </div>
+          @if (registerForm.get('username')?.invalid && (registerForm.get('username')?.dirty || registerForm.get('username')?.touched)) {
+            <div class="error-message">
+              Username must be at least 3 characters long.
+            </div>
+          }
         </div>
-  
+
         <div class="form-group">
           <label for="email">Email</label>
           <div class="input-with-icon">
@@ -25,32 +27,44 @@
               <i class="fa-solid fa-envelope"></i>
             </span> <!-- Email Icon -->
             <input type="email" id="email" formControlName="email" class="form-control" placeholder="Enter email" required />
-          </div>          <div *ngIf="registerForm.get('email')?.invalid && (registerForm.get('email')?.dirty || registerForm.get('email')?.touched)" class="error-message">
+          </div>          @if (registerForm.get('email')?.invalid && (registerForm.get('email')?.dirty || registerForm.get('email')?.touched)) {
+          <div class="error-message">
             Please enter a valid email address.
           </div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-with-icon">
+          <input [type]="showPassword ? 'text' : 'password'" id="password" formControlName="password" class="form-control" placeholder="Enter password" required />
+          <span class="icon password-icon" (click)="togglePasswordVisibility()">
+            @if (!showPassword) {
+              <i class="fa fa-eye"></i>
+              } <!-- Show Password Icon -->
+              @if (showPassword) {
+                <i class="fa fa-eye-slash"></i>
+                } <!-- Hide Password Icon -->
+              </span>
+            </div>          @if (registerForm.get('password')?.invalid && (registerForm.get('password')?.dirty || registerForm.get('password')?.touched)) {
+            <div class="error-message">
+              Password must be at least 6 characters long.
+            </div>
+          }
         </div>
-  
-        <div class="form-group">
-          <label for="password">Password</label>
-          <div class="input-with-icon">
-            <input [type]="showPassword ? 'text' : 'password'" id="password" formControlName="password" class="form-control" placeholder="Enter password" required />
-            <span class="icon password-icon" (click)="togglePasswordVisibility()">
-              <i *ngIf="!showPassword" class="fa fa-eye"></i> <!-- Show Password Icon -->
-              <i *ngIf="showPassword" class="fa fa-eye-slash"></i> <!-- Hide Password Icon -->
-            </span>
-          </div>          <div *ngIf="registerForm.get('password')?.invalid && (registerForm.get('password')?.dirty || registerForm.get('password')?.touched)" class="error-message">
-            Password must be at least 6 characters long.
-          </div>
-        </div>
-  
+
         <button type="submit" class="auth-button" [disabled]="registerForm.invalid">Register
           <i class="fa-solid fa-arrow-right"></i>
         </button>
       </form>
-  
-      <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
-      <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
-  
+
+      @if (errorMessage) {
+        <div class="alert alert-danger">{{ errorMessage }}</div>
+      }
+      @if (successMessage) {
+        <div class="alert alert-success">{{ successMessage }}</div>
+      }
+
       <p class="auth-link">Already have an account? <a routerLink="/login" class="link">Login here</a>.</p>
     </div>
   </div>

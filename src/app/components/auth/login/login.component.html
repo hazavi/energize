@@ -3,7 +3,7 @@
   <div class="auth-box">
     <h2 class="auth-title">Welcome Back</h2>
     <p class="subtitle">Please enter your details to sign in</p>
-    
+
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
       <!-- Email Field -->
       <div class="form-group">
@@ -19,66 +19,75 @@
             class="form-control"
             placeholder="Enter your email"
             required
-          />
+            />
+          </div>
+          @if (loginForm.get('email')?.invalid && (loginForm.get('email')?.dirty || loginForm.get('email')?.touched)) {
+            <div
+              class="error-message"
+              >
+              Please enter a valid email address.
+            </div>
+          }
         </div>
-        <div
-          *ngIf="loginForm.get('email')?.invalid && (loginForm.get('email')?.dirty || loginForm.get('email')?.touched)"
-          class="error-message"
-        >
-          Please enter a valid email address.
+
+        <!-- Password Field -->
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-with-icon">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              id="password"
+              formControlName="password"
+              class="form-control"
+              placeholder="Enter your password"
+              required
+              />
+              <span
+                class="icon password-icon"
+                (click)="togglePasswordVisibility()"
+                >
+                @if (!showPassword) {
+                  <i class="fa fa-eye"></i>
+                  } <!-- Show Password Icon -->
+                  @if (showPassword) {
+                    <i class="fa fa-eye-slash"></i>
+                    } <!-- Hide Password Icon -->
+                  </span>
+                </div>
+                @if (loginForm.get('password')?.invalid && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)) {
+                  <div
+                    class="error-message"
+                    >
+                    Password must be at least 6 characters long.
+                  </div>
+                }
+              </div>
+
+              <!-- Submit Button -->
+              <button
+                type="submit"
+                class="auth-button"
+                [disabled]="loginForm.invalid || isLoading"
+                >
+                @if (!isLoading) {
+                  Login
+                  <i class="fa-solid fa-arrow-right"></i>
+                } @else {
+                  <i class="fa fa-spinner fa-spin"></i> Logging in...
+                }
+              </button>
+            </form>
+
+            @if (errorMessage) {
+              <div class="alert alert-danger">{{ errorMessage }}</div>
+            }
+            @if (successMessage) {
+              <div class="alert alert-success">{{ successMessage }}</div>
+            }
+
+            <p class="auth-link">
+              Don't have an account?
+              <a routerLink="/register" class="link">Register here</a>.
+            </p>
+          </div>
         </div>
-      </div>
-
-      <!-- Password Field -->
-      <div class="form-group">
-        <label for="password">Password</label>
-        <div class="input-with-icon">
-          <input
-            [type]="showPassword ? 'text' : 'password'"
-            id="password"
-            formControlName="password"
-            class="form-control"
-            placeholder="Enter your password"
-            required
-          />
-          <span
-            class="icon password-icon"
-            (click)="togglePasswordVisibility()"
-          >
-            <i *ngIf="!showPassword" class="fa fa-eye"></i> <!-- Show Password Icon -->
-            <i *ngIf="showPassword" class="fa fa-eye-slash"></i> <!-- Hide Password Icon -->
-          </span>
-        </div>
-        <div
-          *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)"
-          class="error-message"
-        >
-          Password must be at least 6 characters long.
-        </div>
-      </div>
-
-      <!-- Submit Button -->
-      <button
-        type="submit"
-        class="auth-button"
-        [disabled]="loginForm.invalid || isLoading"
-      >
-        <ng-container *ngIf="!isLoading; else loadingSpinner">
-          Login
-          <i class="fa-solid fa-arrow-right"></i>
-        </ng-container>
-        <ng-template #loadingSpinner>
-          <i class="fa fa-spinner fa-spin"></i> Logging in...
-        </ng-template>
-      </button>
-    </form>
-
-    <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
-    <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
-
-    <p class="auth-link">
-      Don't have an account?
-      <a routerLink="/register" class="link">Register here</a>.
-    </p>
-  </div>
-</div>

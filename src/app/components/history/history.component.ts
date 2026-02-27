@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { GenericService } from '../../service/generic.service';
 import { FormsModule } from '@angular/forms';
 import { LoadingComponent } from '../loading/loading.component';
@@ -11,7 +11,7 @@ import { WorkoutHistory } from '../../models/workouthistory';
 @Component({
   selector: 'app-history',
   standalone: true,
-  imports: [CommonModule, FormsModule, LoadingComponent],
+  imports: [FormsModule, LoadingComponent],
   templateUrl: './history.component.html',
   styleUrls: ['./history.component.css']
 })

@@ -4,14 +4,14 @@ import { GenericService } from '../../service/generic.service';
 import { Exercise } from '../../models/exercise';
 import { BodyPart } from '../../models/bodypart';
 import { Category } from '../../models/category';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LoadingComponent } from '../loading/loading.component';
 import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-exercises',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [FormsModule, ReactiveFormsModule],
   templateUrl: './exercises.component.html',
   styleUrls: ['./exercises.component.css'],
 })

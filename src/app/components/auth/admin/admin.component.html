@@ -1,217 +1,243 @@
 <div class="admin-container">
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h3>
-                <div class="logo-icon">A</div>
-                <span>Admin Panel</span>
-            </h3>
-        </div>
-        <ul>
-            <li (click)="currentView = 'bodyparts'" [class.active]="currentView === 'bodyparts'">
-                <i class="fas fa-dumbbell"></i>
-                <span>Body Parts</span>
-            </li>
-            <li (click)="currentView = 'categories'" [class.active]="currentView === 'categories'">
-                <i class="fas fa-folder"></i>
-                <span>Categories</span>
-            </li>
-            <li (click)="currentView = 'exercises'" [class.active]="currentView === 'exercises'">
-                <i class="fas fa-running"></i>
-                <span>Exercises</span>
-            </li>
-        </ul>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h3>
+        <div class="logo-icon">A</div>
+        <span>Admin Panel</span>
+      </h3>
     </div>
+    <ul>
+      <li (click)="currentView = 'bodyparts'" [class.active]="currentView === 'bodyparts'">
+        <i class="fas fa-dumbbell"></i>
+        <span>Body Parts</span>
+      </li>
+      <li (click)="currentView = 'categories'" [class.active]="currentView === 'categories'">
+        <i class="fas fa-folder"></i>
+        <span>Categories</span>
+      </li>
+      <li (click)="currentView = 'exercises'" [class.active]="currentView === 'exercises'">
+        <i class="fas fa-running"></i>
+        <span>Exercises</span>
+      </li>
+    </ul>
+  </div>
 
-    <!-- Main Content -->
-    <div class="content">
-        <div *ngIf="currentView === 'bodyparts'">
-            <div class="content-header">
-                <h2>Body Parts</h2>
-                <button class="btn btn-primary" (click)="openModal()">
-                    <i class="fas fa-plus"></i> Add Body Part
-                </button>
-            </div>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let part of bodyParts | paginate: { itemsPerPage: 9, currentPage: bodyPartsPage }">
-                            <td>{{ part.id }}</td>
-                            <td>{{ part.name }}</td>
-                            <td>
-                                <div class="table-actions">
-                                    <button class="btn btn-icon" (click)="editBodyPart(part)" title="Edit">
-                                        <i class="fas fa-edit" style="color: #4f46e5;"></i>
-                                    </button>
-                                    <button class="btn btn-icon" (click)="deleteBodyPart(part.bodyPartId)"
-                                        title="Delete">
-                                        <i class="fas fa-trash" style="color: #ef4444;"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <pagination-controls class="pagination" (pageChange)="bodyPartsPage = $event"></pagination-controls>
-            </div>
+  <!-- Main Content -->
+  <div class="content">
+    @if (currentView === 'bodyparts') {
+      <div>
+        <div class="content-header">
+          <h2>Body Parts</h2>
+          <button class="btn btn-primary" (click)="openModal()">
+            <i class="fas fa-plus"></i> Add Body Part
+          </button>
         </div>
-
-        <div *ngIf="currentView === 'categories'">
-            <div class="content-header">
-                <h2>Categories</h2>
-                <button class="btn btn-primary" (click)="openModal()">
-                    <i class="fas fa-plus"></i> Add Category
-                </button>
-            </div>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr
-                            *ngFor="let category of categories | paginate: { itemsPerPage: 9, currentPage: categoriesPage }">
-                            <td>{{ category.id }}</td>
-                            <td>{{ category.name }}</td>
-                            <td>
-                                <div class="table-actions">
-                                    <button class="btn btn-icon" (click)="editCategory(category)" title="Edit">
-                                        <i class="fas fa-edit" style="color: #4f46e5;"></i>
-                                    </button>
-                                    <button class="btn btn-icon" (click)="deleteCategory(category.categoryId)"
-                                        title="Delete">
-                                        <i class="fas fa-trash" style="color: #ef4444;"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <pagination-controls class="pagination" (pageChange)="categoriesPage = $event"></pagination-controls>
-            </div>
-        </div>
-
-        <div *ngIf="currentView === 'exercises'">
-            <div class="content-header">
-                <h2>Exercises</h2>
-                <button class="btn btn-primary" (click)="openModal()">
-                    <i class="fas fa-plus"></i> Add Exercise
-                </button>
-            </div>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Body Part</th>
-                            <th>Category</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr
-                            *ngFor="let exercise of exercises | paginate: { itemsPerPage: 9, currentPage: exercisesPage }">
-                            <td>{{ exercise.id }}</td>
-                            <td>{{ exercise.name }}</td>
-                            <td>{{ getBodyPartName(exercise.bodypart_id) }}</td>
-                            <td>{{ getCategoryName(exercise.category_id) }}</td>
-                            <td>
-                                <div class="table-actions">
-                                    <button class="btn btn-icon" (click)="editExercise(exercise)" title="Edit">
-                                        <i class="fas fa-edit" style="color: #4f46e5;"></i>
-                                    </button>
-                                    <button class="btn btn-icon" (click)="deleteExercise(exercise.id)" title="Delete">
-                                        <i class="fas fa-trash" style="color: #ef4444;"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <pagination-controls class="pagination" (pageChange)="exercisesPage = $event"></pagination-controls>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Dialog -->
-    <div class="modal-backdrop" *ngIf="isModalOpen">
-        <div class="modal">
-            <div class="modal-header">
-                <h3>{{ currentView === 'bodyparts' ? (newBodyPart.bodyPartId ? 'Edit Body Part' : 'Add Body Part') :
-                    currentView === 'categories' ? (newCategory.categoryId ? 'Edit Category' : 'Add Category') :
-                    (newExercise.exerciseId ? 'Edit Exercise' : 'Add Exercise') }}</h3>
-                <span (click)="closeModal()" class="close">&times;</span>
-            </div>
-            <div class="modal-body">
-                <!-- Dynamic Form Fields -->
-                <div *ngIf="currentView === 'bodyparts'">
-                    <div class="form-group">
-                        <label for="bodyPartName">Body Part Name</label>
-                        <input id="bodyPartName" class="form-control" [(ngModel)]="newBodyPart.name" required
-                            placeholder="Enter Body Part Name" />
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (part of bodyParts | paginate: { itemsPerPage: 9, currentPage: bodyPartsPage }; track part) {
+                <tr>
+                  <td>{{ part.id }}</td>
+                  <td>{{ part.name }}</td>
+                  <td>
+                    <div class="table-actions">
+                      <button class="btn btn-icon" (click)="editBodyPart(part)" title="Edit">
+                        <i class="fas fa-edit" style="color: #4f46e5;"></i>
+                      </button>
+                      <button class="btn btn-icon" (click)="deleteBodyPart(part.bodyPartId)"
+                        title="Delete">
+                        <i class="fas fa-trash" style="color: #ef4444;"></i>
+                      </button>
                     </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+          <pagination-controls class="pagination" (pageChange)="bodyPartsPage = $event"></pagination-controls>
+        </div>
+      </div>
+    }
+
+    @if (currentView === 'categories') {
+      <div>
+        <div class="content-header">
+          <h2>Categories</h2>
+          <button class="btn btn-primary" (click)="openModal()">
+            <i class="fas fa-plus"></i> Add Category
+          </button>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (category of categories | paginate: { itemsPerPage: 9, currentPage: categoriesPage }; track category) {
+                <tr
+                  >
+                  <td>{{ category.id }}</td>
+                  <td>{{ category.name }}</td>
+                  <td>
+                    <div class="table-actions">
+                      <button class="btn btn-icon" (click)="editCategory(category)" title="Edit">
+                        <i class="fas fa-edit" style="color: #4f46e5;"></i>
+                      </button>
+                      <button class="btn btn-icon" (click)="deleteCategory(category.categoryId)"
+                        title="Delete">
+                        <i class="fas fa-trash" style="color: #ef4444;"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+          <pagination-controls class="pagination" (pageChange)="categoriesPage = $event"></pagination-controls>
+        </div>
+      </div>
+    }
+
+    @if (currentView === 'exercises') {
+      <div>
+        <div class="content-header">
+          <h2>Exercises</h2>
+          <button class="btn btn-primary" (click)="openModal()">
+            <i class="fas fa-plus"></i> Add Exercise
+          </button>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Body Part</th>
+                <th>Category</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (exercise of exercises | paginate: { itemsPerPage: 9, currentPage: exercisesPage }; track exercise) {
+                <tr
+                  >
+                  <td>{{ exercise.id }}</td>
+                  <td>{{ exercise.name }}</td>
+                  <td>{{ getBodyPartName(exercise.bodypart_id) }}</td>
+                  <td>{{ getCategoryName(exercise.category_id) }}</td>
+                  <td>
+                    <div class="table-actions">
+                      <button class="btn btn-icon" (click)="editExercise(exercise)" title="Edit">
+                        <i class="fas fa-edit" style="color: #4f46e5;"></i>
+                      </button>
+                      <button class="btn btn-icon" (click)="deleteExercise(exercise.id)" title="Delete">
+                        <i class="fas fa-trash" style="color: #ef4444;"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+          <pagination-controls class="pagination" (pageChange)="exercisesPage = $event"></pagination-controls>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Modal Dialog -->
+  @if (isModalOpen) {
+    <div class="modal-backdrop">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>{{ currentView === 'bodyparts' ? (newBodyPart.bodyPartId ? 'Edit Body Part' : 'Add Body Part') :
+            currentView === 'categories' ? (newCategory.categoryId ? 'Edit Category' : 'Add Category') :
+          (newExercise.exerciseId ? 'Edit Exercise' : 'Add Exercise') }}</h3>
+          <span (click)="closeModal()" class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+          <!-- Dynamic Form Fields -->
+          @if (currentView === 'bodyparts') {
+            <div>
+              <div class="form-group">
+                <label for="bodyPartName">Body Part Name</label>
+                <input id="bodyPartName" class="form-control" [(ngModel)]="newBodyPart.name" required
+                  placeholder="Enter Body Part Name" />
                 </div>
-                <div *ngIf="currentView === 'categories'">
-                    <div class="form-group">
-                        <label for="categoryName">Category Name</label>
-                        <input id="categoryName" class="form-control" [(ngModel)]="newCategory.name" required
-                            placeholder="Enter Category Name" />
-                    </div>
+              </div>
+            }
+            @if (currentView === 'categories') {
+              <div>
+                <div class="form-group">
+                  <label for="categoryName">Category Name</label>
+                  <input id="categoryName" class="form-control" [(ngModel)]="newCategory.name" required
+                    placeholder="Enter Category Name" />
+                  </div>
                 </div>
-                <div *ngIf="currentView === 'exercises'">
+              }
+              @if (currentView === 'exercises') {
+                <div>
+                  <div class="form-group">
+                    <label for="thumbnail">Thumbnail</label>
+                    <input type="file" id="thumbnail" class="form-control" (change)="onFileChange($event)" />
+                  </div>
+                  @if (imagePreview) {
+                    <div class="image-preview">
+                      <img [src]="imagePreview" alt="Thumbnail Preview"
+                        style="max-width: 100px; max-height: 100px;" />
+                      </div>
+                    }
                     <div class="form-group">
-                        <label for="thumbnail">Thumbnail</label>
-                        <input type="file" id="thumbnail" class="form-control" (change)="onFileChange($event)" />
-                    </div>
-                    <div *ngIf="imagePreview" class="image-preview">
-                        <img [src]="imagePreview" alt="Thumbnail Preview"
-                            style="max-width: 100px; max-height: 100px;" />
-                    </div>
-                    <div class="form-group">
-                        <label for="exerciseName">Exercise Name</label>
-                        <input id="exerciseName" class="form-control" [(ngModel)]="newExercise.name" required
-                            placeholder="Exercise Name" />
-                    </div>
-                    <div class="form-group">
+                      <label for="exerciseName">Exercise Name</label>
+                      <input id="exerciseName" class="form-control" [(ngModel)]="newExercise.name" required
+                        placeholder="Exercise Name" />
+                      </div>
+                      <div class="form-group">
                         <label for="instructions">Instructions</label>
                         <textarea id="instructions" class="form-control" [(ngModel)]="newExercise.instructions" required
-                            placeholder="Instructions" rows="3"></textarea>
-                    </div>
-                    <div class="form-group">
+                        placeholder="Instructions" rows="3"></textarea>
+                      </div>
+                      <div class="form-group">
                         <label for="bodyPartId">Body Part</label>
                         <select id="bodyPartId" class="form-control" [(ngModel)]="newExercise.bodypart_id" required>
-                            <option *ngFor="let part of bodyParts" [value]="part.id">{{ part.name }}
+                          @for (part of bodyParts; track part) {
+                            <option [value]="part.id">{{ part.name }}
                             </option>
+                          }
                         </select>
-                    </div>
-                    <div class="form-group">
+                      </div>
+                      <div class="form-group">
                         <label for="categoryId">Category</label>
                         <select id="categoryId" class="form-control" [(ngModel)]="newExercise.category_id" required>
-                            <option *ngFor="let category of categories" [value]="category.id">{{
-                                category.name }}
+                          @for (category of categories; track category) {
+                            <option [value]="category.id">{{
+                              category.name }}
                             </option>
+                          }
                         </select>
+                      </div>
                     </div>
+                  }
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn" (click)="closeModal()">Cancel</button>
-                <button class="btn btn-primary" (click)="addOrUpdateEntry()">
+                <div class="modal-footer">
+                  <button class="btn" (click)="closeModal()">Cancel</button>
+                  <button class="btn btn-primary" (click)="addOrUpdateEntry()">
                     <i class="fas fa-save"></i> Save
-                </button>
+                  </button>
+                </div>
+              </div>
             </div>
+          }
         </div>
-    </div>
-</div>

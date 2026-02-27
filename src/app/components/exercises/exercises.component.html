@@ -11,103 +11,119 @@
       <i class="fas fa-search search-icon"></i>
       <input type="text" [(ngModel)]="searchTerm" placeholder="Search exercises..." class="search-input"
         (input)="applyFilters()">
-    </div>
-
-    <!-- Filter Options -->
-    <div class="filter-options">
-      <!-- Body Part Filter -->
-      <div class="filter-select">
-        <select id="bodypart-filter" [(ngModel)]="selectedBodyPart" (change)="applyFilters()">
-          <option [ngValue]="0">All Body Parts</option>
-          <option *ngFor="let part of bodyParts" [ngValue]="part.id">{{part.name}}</option>
-        </select>
       </div>
 
-      <!-- Category Filter -->
-      <div class="filter-select">
-        <select id="category-filter" [(ngModel)]="selectedCategory" (change)="applyFilters()">
-          <option [ngValue]="0">All Categories</option>
-          <option *ngFor="let cat of categories" [ngValue]="cat.id">{{cat.name}}</option>
-        </select>
-      </div>
-
-      <!-- Clear Filters Button -->
-      <button class="clear-filters-btn" (click)="clearFilters()" [disabled]="!hasActiveFilters">
-        <i class="fas fa-times"></i> Clear
-      </button>
-    </div>
-  </div>
-
-  <!-- Loading Spinner -->
-  <div *ngIf="isLoading" class="loading-container">
-    <div class="spinner"></div>
-    <p>Loading exercises...</p>
-  </div>
-
-  <!-- Exercises List -->
-  <div *ngIf="!isLoading && filteredExercises.length > 0" class="exercises-grid">
-    <div *ngFor="let exercise of paginatedExercises" class="exercise-card">
-      <!-- Exercise Thumbnail with overlay icon for no image -->
-      <div class="thumbnail">
-        <img [src]="exercise.thumbnail" alt="{{ exercise.name }} thumbnail" class="exercise-thumbnail"
-          (error)="handleImageError($event)" />
-        <div *ngIf="!exercise.thumbnail" class="no-image-overlay">
-          <i class="fas fa-dumbbell"></i>
+      <!-- Filter Options -->
+      <div class="filter-options">
+        <!-- Body Part Filter -->
+        <div class="filter-select">
+          <select id="bodypart-filter" [(ngModel)]="selectedBodyPart" (change)="applyFilters()">
+            <option [ngValue]="0">All Body Parts</option>
+            @for (part of bodyParts; track part) {
+              <option [ngValue]="part.id">{{part.name}}</option>
+            }
+          </select>
         </div>
-      </div>
 
-      <!-- Exercise Details -->
-      <div class="details">
-        <h3 class="exercise-name" [title]="exercise.name">{{ exercise.name }}</h3>
-        <div class="meta-info">
-          <div class="meta-item bodypart" *ngIf="exercise.bodypart_id">
-            <i class="fas fa-running bodypart-icon"></i>
-            <span class="meta-value" [title]="getBodyPartName(exercise.bodypart_id)">
-              {{getBodyPartName(exercise.bodypart_id)}}
-            </span>
-          </div>
-          <div class="meta-item category" *ngIf="exercise.category_id">
-            <i class="fas fa-tag category-icon"></i>
-            <span class="meta-value" [title]="getCategoryName(exercise.category_id)">
-              {{getCategoryName(exercise.category_id)}}
-            </span>
-          </div>
+        <!-- Category Filter -->
+        <div class="filter-select">
+          <select id="category-filter" [(ngModel)]="selectedCategory" (change)="applyFilters()">
+            <option [ngValue]="0">All Categories</option>
+            @for (cat of categories; track cat) {
+              <option [ngValue]="cat.id">{{cat.name}}</option>
+            }
+          </select>
         </div>
+
+        <!-- Clear Filters Button -->
+        <button class="clear-filters-btn" (click)="clearFilters()" [disabled]="!hasActiveFilters">
+          <i class="fas fa-times"></i> Clear
+        </button>
       </div>
     </div>
-  </div>
 
-  <!-- No Exercises Found -->
-  <div *ngIf="!isLoading && filteredExercises.length === 0" class="no-exercises">
-    <i class="fas fa-search empty-icon"></i>
-    <p>No exercises found matching your filters.</p>
-    <button class="clear-filters-btn" (click)="clearFilters()">Clear All Filters</button>
-  </div>
+    <!-- Loading Spinner -->
+    @if (isLoading) {
+      <div class="loading-container">
+        <div class="spinner"></div>
+        <p>Loading exercises...</p>
+      </div>
+    }
 
-  <!-- Improved Pagination Controls -->
-  <div class="pagination-controls" *ngIf="totalPages > 1">
-    <!-- Previous button -->
-    <button class="pagination-btn prev" (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">
-      <i class="fas fa-chevron-left"></i>
-    </button>
+    <!-- Exercises List -->
+    @if (!isLoading && filteredExercises.length > 0) {
+      <div class="exercises-grid">
+        @for (exercise of paginatedExercises; track exercise) {
+          <div class="exercise-card">
+            <!-- Exercise Thumbnail with overlay icon for no image -->
+            <div class="thumbnail">
+              <img [src]="exercise.thumbnail" alt="{{ exercise.name }} thumbnail" class="exercise-thumbnail"
+                (error)="handleImageError($event)" />
+                @if (!exercise.thumbnail) {
+                  <div class="no-image-overlay">
+                    <i class="fas fa-dumbbell"></i>
+                  </div>
+                }
+              </div>
+              <!-- Exercise Details -->
+              <div class="details">
+                <h3 class="exercise-name" [title]="exercise.name">{{ exercise.name }}</h3>
+                <div class="meta-info">
+                  @if (exercise.bodypart_id) {
+                    <div class="meta-item bodypart">
+                      <i class="fas fa-running bodypart-icon"></i>
+                      <span class="meta-value" [title]="getBodyPartName(exercise.bodypart_id)">
+                        {{getBodyPartName(exercise.bodypart_id)}}
+                      </span>
+                    </div>
+                  }
+                  @if (exercise.category_id) {
+                    <div class="meta-item category">
+                      <i class="fas fa-tag category-icon"></i>
+                      <span class="meta-value" [title]="getCategoryName(exercise.category_id)">
+                        {{getCategoryName(exercise.category_id)}}
+                      </span>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
 
-    <!-- Page numbers -->
-    <div class="pagination-numbers">
-      <ng-container *ngFor="let page of getDisplayedPageNumbers()">
-        <ng-container *ngIf="page !== -1; else ellipsis">
-          <button class="page-number" [class.active]="page === currentPage" (click)="changePage(page)">
-            {{ page }}
+      <!-- No Exercises Found -->
+      @if (!isLoading && filteredExercises.length === 0) {
+        <div class="no-exercises">
+          <i class="fas fa-search empty-icon"></i>
+          <p>No exercises found matching your filters.</p>
+          <button class="clear-filters-btn" (click)="clearFilters()">Clear All Filters</button>
+        </div>
+      }
+
+      <!-- Improved Pagination Controls -->
+      @if (totalPages > 1) {
+        <div class="pagination-controls">
+          <!-- Previous button -->
+          <button class="pagination-btn prev" (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">
+            <i class="fas fa-chevron-left"></i>
           </button>
-        </ng-container>
-        <ng-template #ellipsis>
-          <span class="ellipsis">•••</span>
-        </ng-template>
-      </ng-container>
+          <!-- Page numbers -->
+          <div class="pagination-numbers">
+            @for (page of getDisplayedPageNumbers(); track page) {
+              @if (page !== -1) {
+                <button class="page-number" [class.active]="page === currentPage" (click)="changePage(page)">
+                  {{ page }}
+                </button>
+              } @else {
+                <span class="ellipsis">•••</span>
+              }
+            }
+          </div>
+          <!-- Next button -->
+          <button class="pagination-btn next" (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      }
     </div>
-
-    <!-- Next button -->
-    <button class="pagination-btn next" (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">
-      <i class="fas fa-chevron-right"></i>
-    </button>
-  </div>
-</div>
