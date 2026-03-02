@@ -93,7 +93,7 @@
       }
 
       <!-- No Exercises Found -->
-      @if (!isLoading && filteredExercises.length === 0) {
+      @if (!isLoading && filteredExercises.length === 0 && gymVisualExercises.length === 0) {
         <div class="no-exercises">
           <i class="fas fa-search empty-icon"></i>
           <p>No exercises found matching your filters.</p>
@@ -101,18 +101,108 @@
         </div>
       }
 
-      <!-- Improved Pagination Controls -->
-      @if (totalPages > 1) {
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- GymVisual Exercise Catalog                         -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <div class="gymvisual-section">
+      <div class="gymvisual-header">
+        <h2 class="gymvisual-title">
+          <i class="fas fa-dumbbell"></i>
+          Exercise Catalog
+        </h2>
+        <span class="gymvisual-count">{{ gymVisualTotalItems }} exercises</span>
+      </div>
+
+      <!-- GymVisual Filter Bar -->
+      <div class="gymvisual-filters">
+        <!-- Exercise Type -->
+        <div class="gv-filter-group">
+          <label class="gv-filter-label">Exercise Type</label>
+          <select [(ngModel)]="selectedExerciseType" (change)="applyGymVisualFilters()" class="gv-select">
+            @for (et of gymVisualFilters.exerciseTypes; track et.id) {
+              <option [ngValue]="et.id">{{ et.name }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Body Part (GymVisual) -->
+        <div class="gv-filter-group">
+          <label class="gv-filter-label">Body Part</label>
+          <select [(ngModel)]="selectedGymBodyPart" (change)="applyGymVisualFilters()" class="gv-select">
+            @for (bp of gymVisualFilters.bodyParts; track bp.id) {
+              <option [ngValue]="bp.id">{{ bp.name }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Equipment Type -->
+        <div class="gv-filter-group">
+          <label class="gv-filter-label">Equipment</label>
+          <select [(ngModel)]="selectedEquipmentType" (change)="applyGymVisualFilters()" class="gv-select">
+            @for (eq of gymVisualFilters.equipmentTypes; track eq.id) {
+              <option [ngValue]="eq.id">{{ eq.name }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Gender -->
+        <div class="gv-filter-group">
+          <label class="gv-filter-label">Gender</label>
+          <select [(ngModel)]="selectedGender" (change)="applyGymVisualFilters()" class="gv-select">
+            @for (g of gymVisualFilters.genders; track g.id) {
+              <option [ngValue]="g.id">{{ g.name }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Style Badge (fixed to Basic Grey) -->
+      <div class="gymvisual-style-badge">
+        <span class="badge-label">Style:</span>
+        <span class="badge-value">Basic Grey</span>
+      </div>
+
+      <!-- GymVisual Loading -->
+      @if (gymVisualLoading) {
+        <div class="loading-container">
+          <div class="spinner"></div>
+          <p>Loading exercises from catalog...</p>
+        </div>
+      }
+
+      <!-- GymVisual Exercises Grid -->
+      @if (!gymVisualLoading && gymVisualExercises.length > 0) {
+        <div class="gymvisual-grid">
+          @for (gvExercise of gymVisualExercises; track gvExercise.id) {
+            <div class="gv-card">
+              <div class="gv-thumbnail">
+                <img [src]="gvExercise.gifUrl" [alt]="gvExercise.name" class="gv-gif"
+                  (error)="handleImageError($event)" loading="lazy" />
+              </div>
+              <div class="gv-details">
+                <h4 class="gv-name" [title]="gvExercise.name">{{ gvExercise.name }}</h4>
+                <span class="gv-ref">[{{ gvExercise.reference }}]</span>
+              </div>
+            </div>
+          }
+        </div>
+      } @else if (!gymVisualLoading) {
+        <div class="no-exercises">
+          <i class="fas fa-search empty-icon"></i>
+          <p>No exercises found matching your filters.</p>
+        </div>
+      }
+
+      <!-- Pagination -->
+      @if (gymVisualTotalPages > 1) {
         <div class="pagination-controls">
-          <!-- Previous button -->
-          <button class="pagination-btn prev" (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">
+          <button class="pagination-btn prev" (click)="changeGymVisualPageAndScroll(gymVisualPage - 1)" [disabled]="gymVisualPage === 1">
             <i class="fas fa-chevron-left"></i>
           </button>
-          <!-- Page numbers -->
           <div class="pagination-numbers">
-            @for (page of getDisplayedPageNumbers(); track page) {
+            @for (page of getGymVisualDisplayedPageNumbers(); track page) {
               @if (page !== -1) {
-                <button class="page-number" [class.active]="page === currentPage" (click)="changePage(page)">
+                <button class="page-number" [class.active]="page === gymVisualPage" (click)="changeGymVisualPageAndScroll(page)">
                   {{ page }}
                 </button>
               } @else {
@@ -120,10 +210,17 @@
               }
             }
           </div>
-          <!-- Next button -->
-          <button class="pagination-btn next" (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">
+          <button class="pagination-btn next" (click)="changeGymVisualPageAndScroll(gymVisualPage + 1)" [disabled]="gymVisualPage === gymVisualTotalPages">
             <i class="fas fa-chevron-right"></i>
           </button>
         </div>
       }
+
+      <!-- Product Count -->
+      @if (gymVisualTotalItems > 0) {
+        <div class="gymvisual-product-count">
+          Showing {{ ((gymVisualPage - 1) * pageSize) + 1 }} - {{ gymVisualPage * pageSize > gymVisualTotalItems ? gymVisualTotalItems : gymVisualPage * pageSize }} of {{ gymVisualTotalItems }} items
+        </div>
+      }
     </div>
+  </div>

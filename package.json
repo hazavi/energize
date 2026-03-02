@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
+    "proxy": "node server/gymvisual-proxy.js",
     "start": "ng serve",
+    "start:all": "concurrently \"npm run proxy\" \"ng serve\"",
     "build": "node generate-env.js && ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
@@ -21,8 +23,12 @@
     "@angular/platform-browser-dynamic": "^21.2.0",
     "@angular/router": "^21.2.0",
     "@supabase/supabase-js": "^2.49.4",
+    "cheerio": "^1.2.0",
+    "cors": "^2.8.6",
     "dotenv": "^16.4.7",
+    "express": "^5.2.1",
     "ngx-pagination": "^6.0.3",
+    "node-fetch": "^2.7.0",
     "rxjs": "^7.8.2",
     "sortablejs": "^1.15.6",
     "tslib": "^2.3.0",

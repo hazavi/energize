@@ -1,13 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { GenericService } from '../../service/generic.service';
+import { GymVisualService } from '../../service/gymvisual.service';
 import { Exercise } from '../../models/exercise';
 import { BodyPart } from '../../models/bodypart';
 import { Category } from '../../models/category';
+import {
+  GymVisualExercise,
+  GymVisualFilters,
+  GymVisualFilterOption,
+  GymVisualPagination,
+} from '../../models/gymvisual';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LoadingComponent } from '../loading/loading.component';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-exercises',
@@ -22,41 +28,98 @@ export class ExercisesComponent implements OnInit {
   categories: Category[] = [];
   isLoading: boolean = false;
   currentPage: number = 1;
-  pageSize: number = 12;
+  pageSize: number = 20;
 
   // Search and filter properties
   searchTerm: string = '';
   selectedBodyPart: number = 0; // 0 means all
   selectedCategory: number = 0; // 0 means all
 
+  // GymVisual properties
+  gymVisualExercises: GymVisualExercise[] = [];
+  gymVisualFilters!: GymVisualFilters;
+  gymVisualPagination: GymVisualPagination = { currentPage: 1, totalPages: 1, totalItems: 0 };
+  gymVisualLoading: boolean = false;
+  selectedExerciseType: number = 69; // Default: Strength
+  selectedGymBodyPart: number = 0; // 0 means all
+  selectedEquipmentType: number = 0; // 0 means all
+  selectedGender: number = 49; // Default: Male
+  gymVisualPage: number = 1;
+
   constructor(
     private genericService: GenericService<any>,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private gymVisualService: GymVisualService
   ) {}
 
   ngOnInit(): void {
     this.loadBodyParts();
     this.loadCategories();
     this.loadExercises();
+    this.loadGymVisualData();
+  }
+
+  loadGymVisualData(): void {
+    this.selectedGender = this.gymVisualService.getDefaultGender();
+
+    // Load filter options
+    this.gymVisualService.getFilters().subscribe({
+      next: (filters) => {
+        this.gymVisualFilters = filters;
+      },
+      error: (err) => console.error('Error loading GymVisual filters:', err),
+    });
+
+    // Load initial exercises
+    this.fetchGymVisualExercises();
+  }
+
+  fetchGymVisualExercises(): void {
+    this.gymVisualLoading = true;
+    this.gymVisualService
+      .searchExercises(
+        this.selectedGender,
+        this.selectedExerciseType,
+        this.selectedGymBodyPart,
+        this.selectedEquipmentType,
+        this.gymVisualPage,
+        this.pageSize
+      )
+      .subscribe({
+        next: (response) => {
+          this.gymVisualExercises = response.exercises;
+          if (response.pagination) {
+            this.gymVisualPagination = response.pagination;
+          }
+          this.gymVisualLoading = false;
+        },
+        error: (err) => {
+          console.error('Error fetching GymVisual exercises:', err);
+          this.gymVisualLoading = false;
+        },
+      });
   }
 
   loadExercises(): void {
     this.isLoading = true;
     this.genericService.getAll('exercise').subscribe({
       next: (exercises) => {
-        // Process exercises
-        let processedExercises = exercises.map((exercise) => ({
-          ...exercise,
-          base64Thumbnail: exercise.thumbnail || './asset/dumbbell.png',
-          // Add a sortKey based on exercise ID for deterministic sorting
-          sortKey: generateSortKey(exercise.id),
-        }));
+        let processedExercises = exercises.map((exercise: Exercise) => {
+          return {
+            ...exercise,
+            base64Thumbnail: exercise.thumbnail || './assets/dumbbell.png',
+            thumbnail: exercise.thumbnail || '',
+            sortKey: generateSortKey(exercise.id),
+          };
+        });
 
         // Sort by the deterministic sort key
-        processedExercises.sort((a, b) => a.sortKey - b.sortKey);
+        processedExercises.sort(
+          (a: any, b: any) => a.sortKey - b.sortKey
+        );
 
         this.exercises = processedExercises;
-        this.filteredExercises = [...this.exercises]; // Initialize filtered exercises
+        this.filteredExercises = [...this.exercises];
         this.isLoading = false;
       },
       error: (err) => {
@@ -95,12 +158,6 @@ export class ExercisesComponent implements OnInit {
   }
 
   applyFilters(): void {
-    console.log('Applying filters:', {
-      searchTerm: this.searchTerm,
-      selectedBodyPart: this.selectedBodyPart,
-      selectedCategory: this.selectedCategory,
-    });
-
     // Reset pagination when applying filters
     this.currentPage = 1;
 
@@ -138,25 +195,41 @@ export class ExercisesComponent implements OnInit {
       );
     }
 
-    console.log('Filtered exercises:', result.length);
-
     // Update filtered exercises
     this.filteredExercises = result;
+
+    // Also filter GymVisual exercises
+    this.applyGymVisualFilters();
+  }
+
+  applyGymVisualFilters(): void {
+    this.gymVisualPage = 1;
+    this.fetchGymVisualExercises();
   }
 
   clearFilters(): void {
     this.searchTerm = '';
     this.selectedBodyPart = 0;
     this.selectedCategory = 0;
+    this.selectedExerciseType = 69;
+    this.selectedGymBodyPart = 0;
+    this.selectedEquipmentType = 0;
+    this.selectedGender = 49;
     this.filteredExercises = [...this.exercises];
     this.currentPage = 1;
+    this.gymVisualPage = 1;
+    this.fetchGymVisualExercises();
   }
 
   get hasActiveFilters(): boolean {
     return (
       this.searchTerm.trim() !== '' ||
       this.selectedBodyPart > 0 ||
-      this.selectedCategory > 0
+      this.selectedCategory > 0 ||
+      this.selectedExerciseType !== 69 ||
+      this.selectedGymBodyPart > 0 ||
+      this.selectedEquipmentType > 0 ||
+      this.selectedGender !== 49
     );
   }
 
@@ -175,14 +248,57 @@ export class ExercisesComponent implements OnInit {
     return category ? category.name : 'Unknown';
   }
 
+  getGymBodyPartName(id: number): string {
+    if (!this.gymVisualFilters) return '';
+    const part = this.gymVisualFilters.bodyParts.find((p) => p.id === id);
+    return part ? part.name : '';
+  }
+
+  getEquipmentName(id: number): string {
+    if (!this.gymVisualFilters) return '';
+    const eq = this.gymVisualFilters.equipmentTypes.find((e) => e.id === id);
+    return eq ? eq.name : '';
+  }
+
+  getExerciseTypeName(id: number): string {
+    if (!this.gymVisualFilters) return '';
+    const et = this.gymVisualFilters.exerciseTypes.find((e) => e.id === id);
+    return et ? et.name : '';
+  }
+
+  getGenderName(id: number): string {
+    if (!this.gymVisualFilters) return 'Male';
+    const g = this.gymVisualFilters.genders.find((g) => g.id === id);
+    return g ? g.name : 'Male';
+  }
+
   get paginatedExercises(): Exercise[] {
     const startIndex = (this.currentPage - 1) * this.pageSize;
     const endIndex = startIndex + this.pageSize;
     return this.filteredExercises.slice(startIndex, endIndex);
   }
 
-  get totalPages(): number {
-    return Math.ceil(this.filteredExercises.length / this.pageSize);
+  get gymVisualTotalPages(): number {
+    return this.gymVisualPagination.totalPages;
+  }
+
+  get gymVisualTotalItems(): number {
+    return this.gymVisualPagination.totalItems;
+  }
+
+  changeGymVisualPage(page: number): void {
+    if (page >= 1 && page <= this.gymVisualTotalPages) {
+      this.gymVisualPage = page;
+      this.fetchGymVisualExercises();
+    }
+  }
+
+  changeGymVisualPageAndScroll(page: number): void {
+    if (page >= 1 && page <= this.gymVisualTotalPages) {
+      this.gymVisualPage = page;
+      this.fetchGymVisualExercises();
+      this.scrollToTop();
+    }
   }
 
   changePage(page: number): void {
@@ -198,37 +314,39 @@ export class ExercisesComponent implements OnInit {
     }
   }
 
+  get totalPages(): number {
+    return Math.ceil(this.filteredExercises.length / this.pageSize);
+  }
+
   scrollToTop(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // Add this method to your component class
+  getGymVisualDisplayedPageNumbers(): number[] {
+    return this._getPageNumbers(this.gymVisualTotalPages, this.gymVisualPage);
+  }
+
   getDisplayedPageNumbers(): number[] {
+    return this._getPageNumbers(this.totalPages, this.currentPage);
+  }
+
+  private _getPageNumbers(totalPages: number, currentPage: number): number[] {
     const maxPagesVisible = 5;
-    const totalPages = this.totalPages;
-    const currentPage = this.currentPage;
 
     if (totalPages <= maxPagesVisible) {
-      // If we have fewer pages than the max visible, show all pages
       return Array.from({ length: totalPages }, (_, i) => i + 1);
     }
 
-    // Always include first page, last page, current page, and 1-2 pages around current page
     const pages: number[] = [];
-
-    // Always add page 1
     pages.push(1);
 
-    // If current page is far from page 1, add ellipsis
     if (currentPage > 3) {
-      pages.push(-1); // -1 represents ellipsis
+      pages.push(-1);
     }
 
-    // Add pages around current page
     let startPage = Math.max(2, currentPage - 1);
     let endPage = Math.min(totalPages - 1, currentPage + 1);
 
-    // Adjust to show at least 3 pages in the middle when possible
     if (currentPage <= 3) {
       endPage = Math.min(totalPages - 1, 4);
     } else if (currentPage >= totalPages - 2) {
@@ -237,17 +355,14 @@ export class ExercisesComponent implements OnInit {
 
     for (let i = startPage; i <= endPage; i++) {
       if (i !== 1 && i !== totalPages) {
-        // Avoid duplicates
         pages.push(i);
       }
     }
 
-    // If current page is far from last page, add ellipsis
     if (currentPage < totalPages - 2) {
-      pages.push(-1); // -1 represents ellipsis
+      pages.push(-1);
     }
 
-    // Always add last page
     if (totalPages > 1) {
       pages.push(totalPages);
     }
@@ -256,11 +371,7 @@ export class ExercisesComponent implements OnInit {
   }
 }
 
-// Add this helper function somewhere in your component
 function generateSortKey(id: number): number {
-  // Create a deterministic "random" value using the exercise ID
-  // This ensures the same exercises will always get the same sort order
-  // Use a simple hash function (you can adjust this algorithm if needed)
   const seed = id * 9301 + 49297;
   return (seed % 233280) / 233280;
 }
