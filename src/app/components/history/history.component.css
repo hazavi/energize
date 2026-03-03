@@ -1,68 +1,57 @@
-/* Main container */
-.history-container {
+:host {
+  --radius: 12px;
+  --accent: #6366f1;
+  --glass-bg: rgba(255,255,255,0.04);
+  --glass-border: rgba(255,255,255,0.08);
+  --muted: #a1a1aa;
+  --surface: rgba(255,255,255,0.06);
+}
+
+.page {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  overflow-y: auto;
-  padding: 1.5rem;
-  color: #e9ecef;
+  min-height: 100%;
+  color: #fafafa;
 }
 
-/* History header */
-.history-header {
-  margin-bottom: 1.5rem;
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
-.section-title {
+.page-title {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #ffffff;
-  margin-bottom: 0.5rem;
+  letter-spacing: -0.03em;
 }
 
-.section-subtitle {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #ffffff;
-  margin: 1.5rem 0 1rem;
-}
-
-/* Stats Section - Updated for modern look */
-.stats-section {
+/* ── Stats ── */
+.stats-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
+  gap: 12px;
 }
 
 .stat-card {
-  background: #20232b;
-  border-radius: 12px;
-  padding: 1.25rem;
+  padding: 20px;
   display: flex;
   align-items: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: transform 0.2s;
+  gap: 16px;
+  transition: transform 200ms;
 }
-
-.stat-card:hover {
-  transform: translateY(-2px);
-}
+.stat-card:hover { transform: translateY(-2px); }
 
 .stat-icon {
-  background: #3557dc;
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   border-radius: 10px;
+  background: rgba(99,102,241,0.12);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 1rem;
-}
-
-.stat-icon i {
-  color: white;
-  font-size: 1.2rem;
+  color: var(--accent);
+  flex-shrink: 0;
 }
 
 .stat-info {
@@ -71,62 +60,50 @@
 }
 
 .stat-value {
-  font-size: 1.4rem;
+  font-size: 1.35rem;
   font-weight: 700;
-  color: #ffffff;
-  margin-bottom: 0.25rem;
+  letter-spacing: -0.02em;
 }
 
 .stat-label {
-  font-size: 0.85rem;
-  color: #94989e;
+  font-size: 0.8rem;
+  color: var(--muted);
   font-weight: 500;
 }
 
-/* Calendar Section - Cleaner and more modern */
-.calendar-section {
-  background: #20232b;
-  border-radius: 16px;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+/* ── Calendar ── */
+.calendar-card {
+  padding: 24px;
   max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .calendar-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 20px;
 }
 
-.calendar-header h3 {
-  font-size: 1.2rem;
+.calendar-title {
+  font-size: 1.1rem;
   font-weight: 600;
-  margin: 0;
-  color: #ffffff;
+  letter-spacing: -0.01em;
 }
 
-.btn-icon {
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
+.btn-ghost {
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ced4da;
+  color: var(--muted);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 150ms;
 }
-
-.btn-icon:hover {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-}
+.btn-ghost:hover { background: rgba(255,255,255,0.08); color: #fafafa; }
 
 .calendar-grid {
   display: flex;
@@ -136,94 +113,94 @@
 .calendar-weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  margin-bottom: 0.75rem;
+  margin-bottom: 8px;
 }
 
 .weekday {
   text-align: center;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  color: #94989e;
-  padding: 0.5rem;
+  color: var(--muted);
+  padding: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .calendar-days {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
+  gap: 4px;
 }
 
 .calendar-day {
-  aspect-ratio: 1/1;
-  border-radius: 10px;
+  aspect-ratio: 1;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  background: #2a2d36;
-  opacity: 0.6;
-  transition: all 0.15s ease;
-  cursor: pointer;
+  background: var(--surface);
+  opacity: 0.4;
+  transition: all 150ms;
+  cursor: default;
 }
-
-.calendar-day:hover {
-  opacity: 1;
-  transform: scale(1.05);
-}
-
-.calendar-day.current-month {
-  opacity: 1;
-}
+.calendar-day:hover { opacity: 0.7; }
+.calendar-day.current-month { opacity: 1; }
 
 .calendar-day.today {
-  background: #3557dc;
-  box-shadow: 0 3px 8px rgba(53, 87, 220, 0.3);
+  background: var(--accent);
+  box-shadow: 0 0 12px rgba(99,102,241,0.3);
+  color: #fff;
+  font-weight: 600;
 }
 
 .calendar-day.activity-day {
-  background: #3557dc;
-  color: white;
-  font-weight: bold;
+  background: rgba(99,102,241,0.35);
+  color: #c7d2fe;
+  font-weight: 600;
 }
 
 .day-number {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 500;
 }
 
-/* History List Section - More modern */
-.history-list-section {
-  background: #20232b;
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+/* ── History List ── */
+.list-card {
+  padding: 24px;
+}
+
+.section-subtitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  letter-spacing: -0.01em;
 }
 
 .history-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 10px;
 }
 
 .history-item {
-  background: #2a2d36;
-  border-radius: 12px;
-  padding: 1rem;
-  transition: transform 0.2s, box-shadow 0.2s;
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  transition: transform 200ms, box-shadow 200ms;
 }
-
 .history-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
 }
 
 .history-item-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.75rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 0.75rem;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--glass-border);
 }
 
 .history-date {
@@ -233,82 +210,65 @@
 
 .history-date .day {
   font-weight: 600;
-  font-size: 1rem;
-  color: #ffffff;
+  font-size: 0.9rem;
 }
 
 .history-date .time {
-  font-size: 0.85rem;
-  color: #94989e;
-  margin-top: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 2px;
 }
 
-.history-actions .btn-icon {
+.btn-ghost-sm {
+  background: none;
+  border: none;
+  border-radius: 6px;
   width: 32px;
   height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 150ms;
 }
+.btn-ghost-sm:hover { background: rgba(239,68,68,0.12); }
 
 .history-item-details {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 6px;
 }
 
 .history-detail {
   display: flex;
   align-items: center;
-  font-size: 0.9rem;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: #d4d4d8;
 }
 
-.history-detail i {
-  color: #3557dc;
-  margin-right: 0.75rem;
-  width: 16px;
-  text-align: center;
-}
-
-.no-history {
+.empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 3rem 1rem;
-  color: #94989e;
+  padding: 48px 16px;
+  color: #52525b;
   text-align: center;
+  gap: 12px;
 }
 
-.no-history i {
-  font-size: 3rem;
-  opacity: 0.4;
-  margin-bottom: 1rem;
-  color: #3557dc;
+.empty-state p {
+  font-size: 0.875rem;
 }
 
-/* Responsive adjustments */
+/* ── Responsive ── */
 @media (max-width: 768px) {
-  .stats-section {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .calendar-day {
-    font-size: 0.8rem;
-  }
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
 }
 
-@media (max-width: 576px) {
-  .history-container {
-    padding: 1rem;
-  }
-  
-  .calendar-section {
-    padding: 1rem;
-  }
-  
-  .weekday {
-    font-size: 0.7rem;
-  }
-  
-  .calendar-day {
-    min-height: 32px;
-  }
+@media (max-width: 480px) {
+  .stats-row { grid-template-columns: 1fr; }
+  .calendar-card { padding: 16px; }
+  .list-card { padding: 16px; }
 }

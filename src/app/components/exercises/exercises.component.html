@@ -1,108 +1,8 @@
 <!-- exercises.component.html -->
 <div class="exercises-container">
-  <h1 class="title">
-    Exercises
-  </h1>
-
-  <!-- Search and Filter Bar -->
-  <div class="search-filter-container">
-    <!-- Search Bar -->
-    <div class="search-bar">
-      <i class="fas fa-search search-icon"></i>
-      <input type="text" [(ngModel)]="searchTerm" placeholder="Search exercises..." class="search-input"
-        (input)="applyFilters()">
-      </div>
-
-      <!-- Filter Options -->
-      <div class="filter-options">
-        <!-- Body Part Filter -->
-        <div class="filter-select">
-          <select id="bodypart-filter" [(ngModel)]="selectedBodyPart" (change)="applyFilters()">
-            <option [ngValue]="0">All Body Parts</option>
-            @for (part of bodyParts; track part) {
-              <option [ngValue]="part.id">{{part.name}}</option>
-            }
-          </select>
-        </div>
-
-        <!-- Category Filter -->
-        <div class="filter-select">
-          <select id="category-filter" [(ngModel)]="selectedCategory" (change)="applyFilters()">
-            <option [ngValue]="0">All Categories</option>
-            @for (cat of categories; track cat) {
-              <option [ngValue]="cat.id">{{cat.name}}</option>
-            }
-          </select>
-        </div>
-
-        <!-- Clear Filters Button -->
-        <button class="clear-filters-btn" (click)="clearFilters()" [disabled]="!hasActiveFilters">
-          <i class="fas fa-times"></i> Clear
-        </button>
-      </div>
-    </div>
-
-    <!-- Loading Spinner -->
-    @if (isLoading) {
-      <div class="loading-container">
-        <div class="spinner"></div>
-        <p>Loading exercises...</p>
-      </div>
-    }
-
-    <!-- Exercises List -->
-    @if (!isLoading && filteredExercises.length > 0) {
-      <div class="exercises-grid">
-        @for (exercise of paginatedExercises; track exercise) {
-          <div class="exercise-card">
-            <!-- Exercise Thumbnail with overlay icon for no image -->
-            <div class="thumbnail">
-              <img [src]="exercise.thumbnail" alt="{{ exercise.name }} thumbnail" class="exercise-thumbnail"
-                (error)="handleImageError($event)" />
-                @if (!exercise.thumbnail) {
-                  <div class="no-image-overlay">
-                    <i class="fas fa-dumbbell"></i>
-                  </div>
-                }
-              </div>
-              <!-- Exercise Details -->
-              <div class="details">
-                <h3 class="exercise-name" [title]="exercise.name">{{ exercise.name }}</h3>
-                <div class="meta-info">
-                  @if (exercise.bodypart_id) {
-                    <div class="meta-item bodypart">
-                      <i class="fas fa-running bodypart-icon"></i>
-                      <span class="meta-value" [title]="getBodyPartName(exercise.bodypart_id)">
-                        {{getBodyPartName(exercise.bodypart_id)}}
-                      </span>
-                    </div>
-                  }
-                  @if (exercise.category_id) {
-                    <div class="meta-item category">
-                      <i class="fas fa-tag category-icon"></i>
-                      <span class="meta-value" [title]="getCategoryName(exercise.category_id)">
-                        {{getCategoryName(exercise.category_id)}}
-                      </span>
-                    </div>
-                  }
-                </div>
-              </div>
-            </div>
-          }
-        </div>
-      }
-
-      <!-- No Exercises Found -->
-      @if (!isLoading && filteredExercises.length === 0 && gymVisualExercises.length === 0) {
-        <div class="no-exercises">
-          <i class="fas fa-search empty-icon"></i>
-          <p>No exercises found matching your filters.</p>
-          <button class="clear-filters-btn" (click)="clearFilters()">Clear All Filters</button>
-        </div>
-      }
 
     <!-- ═══════════════════════════════════════════════════ -->
-    <!-- GymVisual Exercise Catalog                         -->
+    <!-- Exercise Catalog (GymVisual)                       -->
     <!-- ═══════════════════════════════════════════════════ -->
     <div class="gymvisual-section">
       <div class="gymvisual-header">
@@ -120,7 +20,7 @@
           <label class="gv-filter-label">Exercise Type</label>
           <select [(ngModel)]="selectedExerciseType" (change)="applyGymVisualFilters()" class="gv-select">
             @for (et of gymVisualFilters.exerciseTypes; track et.id) {
-              <option [ngValue]="et.id">{{ et.name }}</option>
+              <option [ngValue]="et.id">{{ et.name }}{{ et.count !== null ? ' (' + et.count + ')' : '' }}</option>
             }
           </select>
         </div>
@@ -130,7 +30,7 @@
           <label class="gv-filter-label">Body Part</label>
           <select [(ngModel)]="selectedGymBodyPart" (change)="applyGymVisualFilters()" class="gv-select">
             @for (bp of gymVisualFilters.bodyParts; track bp.id) {
-              <option [ngValue]="bp.id">{{ bp.name }}</option>
+              <option [ngValue]="bp.id">{{ bp.name }}{{ bp.count !== null ? ' (' + bp.count + ')' : '' }}</option>
             }
           </select>
         </div>
@@ -140,7 +40,7 @@
           <label class="gv-filter-label">Equipment</label>
           <select [(ngModel)]="selectedEquipmentType" (change)="applyGymVisualFilters()" class="gv-select">
             @for (eq of gymVisualFilters.equipmentTypes; track eq.id) {
-              <option [ngValue]="eq.id">{{ eq.name }}</option>
+              <option [ngValue]="eq.id">{{ eq.name }}{{ eq.count !== null ? ' (' + eq.count + ')' : '' }}</option>
             }
           </select>
         </div>
@@ -150,7 +50,7 @@
           <label class="gv-filter-label">Gender</label>
           <select [(ngModel)]="selectedGender" (change)="applyGymVisualFilters()" class="gv-select">
             @for (g of gymVisualFilters.genders; track g.id) {
-              <option [ngValue]="g.id">{{ g.name }}</option>
+              <option [ngValue]="g.id">{{ g.name }}{{ g.count !== null ? ' (' + g.count + ')' : '' }}</option>
             }
           </select>
         </div>
@@ -181,7 +81,6 @@
               </div>
               <div class="gv-details">
                 <h4 class="gv-name" [title]="gvExercise.name">{{ gvExercise.name }}</h4>
-                <span class="gv-ref">[{{ gvExercise.reference }}]</span>
               </div>
             </div>
           }

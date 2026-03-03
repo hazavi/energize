@@ -2,12 +2,6 @@
   display: block;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 .app-container {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -17,32 +11,32 @@
   color: var(--text-clr);
 }
 
+/* ── Sidebar ── */
 #sidebar {
   box-sizing: border-box;
   height: 100vh;
-  width: 230px;
-  padding: 5px 1em;
-  background-color: var(--base-clr);
-  border-right: 1px solid var(--line-clr);
+  width: 220px;
+  padding: 10px 10px;
+  background: rgba(255,255,255,0.015);
+  border-right: 1px solid var(--glass-border);
   position: sticky;
   top: 0;
   align-self: start;
-  transition: 300ms ease-in-out;
+  transition: width 280ms cubic-bezier(0.4, 0, 0.2, 1), padding 280ms cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
-  text-wrap: nowrap;
+  white-space: nowrap;
 
   &.close {
-    padding: 2px;
-    width: 59px;
+    padding: 10px 6px;
+    width: 54px;
 
-    .logo span {
-      display: none;
-    }
+    .logo span { display: none; }
 
     a span {
       opacity: 0;
       width: 0;
-      transition: opacity 200ms ease-in-out;
+      overflow: hidden;
+      transition: opacity 150ms ease;
     }
   }
 
@@ -53,95 +47,86 @@
     height: 100%;
     margin: 0;
     padding: 0;
+    gap: 1px;
 
     > li:first-child {
       display: flex;
       justify-content: flex-end;
-      margin-bottom: 16px;
+      margin-bottom: 24px;
     }
 
     > li {
       margin: 0;
       position: relative;
       width: 100%;
-
-      &::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        width: 3px;
-        height: 0;
-        background-color: var(--accent-clr);
-        transition: height 200ms ease-in-out;
-      }
-
-      &.active a {
-        color: var(--accent-clr);
-        background-color: var(--hover-clr);
-
-        svg, i {
-          fill: var(--accent-clr);
-          transform: scale(1.1);
-        }
-      }
     }
 
     > li:last-child {
       margin-top: auto;
-      padding-bottom: 20px;
-      position: relative; /* Important for positioning the submenu */
+      padding-bottom: 16px;
+      position: relative;
     }
   }
 
   .logo {
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 1.05rem;
     display: flex;
     align-items: center;
-    gap: 1em;
-    padding: 0.85em;
+    gap: 10px;
+    padding: 10px;
     flex-grow: 1;
+    letter-spacing: -0.03em;
+    color: var(--text-clr);
 
-    svg, i {
-      transition: transform 200ms ease-in-out;
+    svg {
+      flex-shrink: 0;
+      transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+      filter: drop-shadow(0 0 6px rgba(99,102,241,0.3));
     }
-
-    &:hover svg, i {
-      transform: rotate(-10deg);
-    }
+    &:hover svg { transform: rotate(-12deg) scale(1.1); }
   }
 
-  a {
-    border-radius: 0.5em;
-    padding: 0.85em;
+  a, #profile-link {
+    border-radius: 8px;
+    padding: 9px 12px;
     text-decoration: none;
-    color: var(--text-clr);
+    color: var(--muted-foreground);
     display: flex;
     align-items: center;
-    gap: 1em;
-    transition: all 200ms ease-in-out;
+    gap: 12px;
+    transition: all 150ms ease;
     position: relative;
     overflow: hidden;
     width: 100%;
     box-sizing: border-box;
+    font-size: 0.835rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
 
     &:hover {
-      background-color: var(--hover-clr);
-      transform: translateX(5px);
+      background: var(--hover-clr);
+      color: var(--text-clr);
       cursor: pointer;
-
-      svg, i {
-        transform: scale(1.1);
-      }
     }
 
-    svg, i {
+    &.active {
+      background: var(--accent-subtle);
+      color: #a5b4fc;
+
+      svg { stroke: #a5b4fc; }
+    }
+
+    svg {
       flex-shrink: 0;
-      transition: transform 200ms ease-in-out, fill 200ms ease-in-out;
+      transition: stroke 150ms ease;
+      width: 18px;
+      height: 18px;
     }
 
     span {
       flex-grow: 1;
-      transition: opacity 200ms ease-in-out;
+      transition: opacity 150ms ease;
       white-space: nowrap;
     }
   }
@@ -149,32 +134,25 @@
 
 #toggle-btn {
   margin-left: auto;
-  padding: 1em;
+  padding: 8px;
   border: none;
-  border-radius: 0.5em;
+  border-radius: 8px;
   background: none;
   cursor: pointer;
-  transition: all 200ms ease-in-out;
-
-  svg {
-    transition: transform 200ms ease-in-out;
-  }
+  color: var(--muted-foreground);
+  transition: all 150ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
-    background-color: var(--hover-clr);
-
-    svg, i {
-      transform: scale(1.1);
-    }
-  }
-
-  &:active svg, i {
-    transform: scale(0.95);
+    background: var(--hover-clr);
+    color: var(--text-clr);
   }
 }
 
 main {
-  padding: 2em;
+  padding: 1.5em 2em;
   width: 100%;
   box-sizing: border-box;
 }
@@ -184,51 +162,34 @@ main {
   max-width: 1200px;
   margin: 0 auto;
   min-height: 80vh;
-  border-radius: 1em;
-  padding: min(1em, 15%);
+  border-radius: var(--radius);
+  padding: min(0.75em, 12%);
   box-sizing: border-box;
-
-  h2,
-  p {
-    margin-top: 1em;
-  }
 }
 
-/* Profile submenu styling - FIXED HEIGHT */
+/* ── Profile Submenu ── */
 #profile-submenu {
   display: none;
   position: absolute;
-  bottom: 100%; /* Position directly above the parent element */
+  bottom: 100%;
   left: 0;
-  background-color: var(--base-clr);
-  border: 1px solid var(--line-clr);
-  border-radius: 0.5em;
+  background: rgba(18,18,21,0.96);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   list-style: none;
-  padding: 0;
-  margin: 0;
-  margin-bottom: 10px; /* Gap between submenu and parent element */
-  z-index: 1500; /* Ensure it's above everything */
-  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
-  min-width: 200px;
-  font-size: 0.9rem;
+  padding: 4px;
+  margin: 0 0 6px 0;
+  z-index: 1500;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03);
+  min-width: 180px;
+  font-size: 0.835rem;
   overflow: hidden;
-  height: auto; /* Let the height adjust to content */
 }
 
-/* Show the submenu when the parent is hovered or clicked */
-li:hover > #profile-submenu,
-li:focus-within > #profile-submenu,
-li.active > #profile-submenu {
-  display: block;
-}
-
-/* Remove fixed heights for admin and non-admin */
-#profile-submenu:not(.admin) {
-  min-height: 120px;
-}
-#profile-submenu.admin {
-  min-height: 165px;
-}
+#profile-submenu:not(.admin) { min-height: auto; }
+#profile-submenu.admin { min-height: auto; }
 
 #profile-submenu li {
   margin: 0;
@@ -236,48 +197,38 @@ li.active > #profile-submenu {
 }
 
 #profile-submenu li a,
-#profile-submenu li button,
 #profile-submenu li #logout-btn {
   text-decoration: none;
-  color: var(--text-clr);
-  background-color: transparent;
-  padding: 0.7em 1em;
+  color: var(--muted-foreground);
+  background: transparent;
+  padding: 8px 12px;
   border: none;
-  border-radius: 0.3em;
+  border-radius: 6px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 0.5em;
-  transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
+  gap: 10px;
+  transition: all 150ms ease;
   font-weight: 500;
   width: 100%;
   box-sizing: border-box;
-  margin: 0;
+  font-size: 0.835rem;
 }
 
 #profile-submenu li a:hover,
-#profile-submenu li button:hover,
 #profile-submenu li #logout-btn:hover {
-  background-color: var(--hover-clr);
-  color: var(--accent-clr);
+  background: var(--hover-clr);
+  color: var(--text-clr);
 }
 
-#profile-submenu li a:focus,
-#profile-submenu li button:focus,
-#profile-submenu li #logout-btn:focus {
-  outline: none;
-  background-color: var(--hover-clr);
-  color: var(--accent-clr);
-}
-
-/* Responsive styles */
+/* ── Responsive: mobile bottom bar ── */
 @media (max-width: 800px) {
   .app-container {
     grid-template-columns: 1fr;
   }
 
   main {
-    padding: 1em 1em 60px 1em;
+    padding: 1em 1em 72px 1em;
     width: 100%;
     box-sizing: border-box;
   }
@@ -292,12 +243,14 @@ li.active > #profile-submenu {
     height: 60px;
     width: 100%;
     border-right: none;
-    border-top: 1px solid var(--line-clr);
+    border-top: 1px solid var(--glass-border);
     padding: 0;
     position: fixed;
     top: unset;
     bottom: 0;
-    background-color: var(--base-clr);
+    background: rgba(9,9,11,0.94);
+    backdrop-filter: blur(24px) saturate(1.2);
+    -webkit-backdrop-filter: blur(24px) saturate(1.2);
     z-index: 1000;
 
     > ul {
@@ -305,31 +258,22 @@ li.active > #profile-submenu {
       height: 60px;
       flex-direction: row;
       display: flex;
-      justify-content: space-evenly; /* Changed to space-evenly for no gaps */
+      justify-content: space-evenly;
       align-items: center;
       width: 100%;
       margin: 0;
+      gap: 0;
       overflow-x: auto;
       scrollbar-width: none;
-      -ms-overflow-style: none;
 
-      &::-webkit-scrollbar {
-        display: none;
-      }
+      &::-webkit-scrollbar { display: none; }
 
       > li {
         height: 100%;
         width: auto;
-        flex: 1 1 0; /* Equal width distribution, no gaps */
+        flex: 1 1 0;
         margin: 0;
         padding: 0;
-
-        &::before {
-          width: 100%;
-          height: 3px;
-          top: 0;
-          transition: width 200ms ease-in-out;
-        }
 
         &:last-child {
           margin-top: 0;
@@ -348,9 +292,9 @@ li.active > #profile-submenu {
       align-items: center;
       transform: none;
 
-      &:hover {
-        transform: translateY(-3px);
-      }
+      &:hover { transform: none; }
+      &.active { background: transparent; }
+      &.active svg { stroke: #a5b4fc; }
     }
 
     ul li span,
@@ -360,29 +304,21 @@ li.active > #profile-submenu {
     }
   }
 
-  /* Fixed mobile profile submenu positioning */
   #profile-submenu {
-    bottom: 60px; /* Position exactly above the mobile nav bar */
-    right: 0; /* Align with the profile icon */
-    margin-bottom: 0; /* Remove the gap */
-    position: fixed; /* Fix position relative to viewport */
-    height: auto; /* Let the height adjust to content */
-    max-height: calc(20vh); /* Prevent it from overflowing the screen */
-    overflow-y: auto; /* Allow scrolling if there are many items */
+    bottom: 60px;
+    right: 0;
+    left: auto;
+    margin-bottom: 0;
+    position: fixed;
+    max-height: 30vh;
+    overflow-y: auto;
   }
 
-  /* For the last nav item that contains the profile link */
   #sidebar > ul > li:last-child {
-    position: static; /* Makes the submenu position relative to the sidebar instead */
-  }
-
-  /* Show submenu when nav item is tapped */
-  #sidebar > ul > li.show-submenu #profile-submenu {
-    display: block;
+    position: static;
   }
 }
 
-/* Add JavaScript toggle class support */
 .show-submenu #profile-submenu {
   display: block !important;
 }

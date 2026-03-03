@@ -4,7 +4,7 @@
       <div class="modal-header">
         <h2>{{ isEditing ? 'Edit Exercise' : 'Add Exercises to Template' }}</h2>
         <button class="btn-icon close-btn" (click)="close.emit()">
-          <i class="fas fa-times"></i>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         </button>
       </div>
       <div class="modal-body">
@@ -12,7 +12,7 @@
         @if (!isEditing) {
           <div class="add-exercise-section">
             <button class="btn btn-primary add-exercise-btn" (click)="openExerciseModal()">
-              <i class="fas fa-plus-circle"></i> Select Exercises
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg> Select Exercises
             </button>
           </div>
         }
@@ -30,7 +30,7 @@
                         class="exercise-thumbnail" (error)="handleImageError($event)" />
                         @if (!item.exercise.thumbnail) {
                           <div class="placeholder">
-                            <i class="fas fa-dumbbell"></i>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>
                           </div>
                         }
                       </div>
@@ -38,14 +38,14 @@
                         <h4 class="exercise-name">{{ item.exercise.name }}</h4>
                         @if (item.exercise.category_id) {
                           <span class="exercise-category">
-                            <i class="fas fa-tag"></i> {{ getCategoryName(item.exercise.category_id) }}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></svg> {{ getCategoryName(item.exercise.category_id) }}
                           </span>
                         }
                       </div>
                     </div>
                     <button class="btn-icon remove-exercise-btn" (click)="toggleExerciseSelection(item.exercise)"
                       title="Remove Exercise">
-                      <i class="fas fa-trash-alt"></i>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                     </button>
                   </div>
                   <!-- Sets Section -->
@@ -64,21 +64,21 @@
                               <input type="number" id="weight-{{i}}-{{j}}" [(ngModel)]="set.weight"
                                 placeholder="Weight" class="form-control" min="0" />
                               </div>
-                              <button class="btn-icon toggle-weight-unit-btn" (click)="toggleWeightUnit(set)"
+                                <button class="btn-icon toggle-weight-unit-btn" (click)="toggleWeightUnit(set)"
                                 title="Toggle Weight Unit">
-                                <i class="fas fa-exchange-alt"></i>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>
                               </button>
                               @if (setsMap[i].length > 1) {
                                 <button class="btn-icon remove-set-btn" (click)="removeSet(i, j)" title="Remove Set"
                                   >
-                                  <i class="fas fa-minus-circle"></i>
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/></svg>
                                 </button>
                               }
                             </div>
                           </div>
                         }
                         <button class="btn btn-outline add-set-btn" (click)="addSet(i)">
-                          <i class="fas fa-plus"></i> Add Set
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg> Add Set
                         </button>
                       </div>
                     </div>
@@ -88,7 +88,7 @@
               <div class="modal-actions">
                 <button class="btn btn-secondary" (click)="close.emit()">Cancel</button>
                 <button class="btn btn-primary" (click)="saveExercises()" [disabled]="templateExercises.length === 0">
-                  <i class="fas fa-save"></i> Save Exercises
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V15"/><path d="M18 18H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"/></svg> Save Exercises
                 </button>
               </div>
             </div>
@@ -103,13 +103,13 @@
             <div class="modal-header">
               <h2>Select Exercises</h2>
               <button class="btn-icon close-btn" (click)="closeExerciseModal()">
-                <i class="fas fa-times"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
               </button>
             </div>
             <div class="modal-body">
               <!-- Search Bar -->
               <div class="search-container">
-                <i class="fas fa-search search-icon"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                 <input type="text" [(ngModel)]="searchTerm" placeholder="Search exercises..." class="search-input" />
               </div>
               <!-- Loading State -->
@@ -134,7 +134,7 @@
                         }
                         @if (!exercise.thumbnail) {
                           <div class="placeholder">
-                            <i class="fas fa-dumbbell"></i>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>
                           </div>
                         }
                       </div>
@@ -146,20 +146,23 @@
                           @if (exercise.bodypart_id) {
                             <span class="bodypart"
                               title="{{ getBodyPartName(exercise.bodypart_id) }}">
-                              <i class="fas fa-dumbbell"></i> {{ getBodyPartName(exercise.bodypart_id) }}
+                              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg> {{ getBodyPartName(exercise.bodypart_id) }}
                             </span>
                           }
                           @if (exercise.category_id) {
                             <span class="category"
                               title="{{ getCategoryName(exercise.category_id) }}">
-                              <i class="fas fa-tag"></i> {{ getCategoryName(exercise.category_id) }}
+                              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></svg> {{ getCategoryName(exercise.category_id) }}
                             </span>
                           }
                         </div>
                       </div>
                       <div class="selection-indicator">
-                        <i class="fas"
-                        [ngClass]="selectedExercises.includes(exercise) ? 'fa-check-circle' : 'fa-circle'"></i>
+                        @if (selectedExercises.includes(exercise)) {
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        } @else {
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>
+                        }
                       </div>
                     </div>
                   }
@@ -168,7 +171,7 @@
               <!-- Empty State -->
               @if (!isLoading && filteredExercises.length === 0) {
                 <div class="empty-state">
-                  <i class="fas fa-search"></i>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                   <p>No exercises found</p>
                   <p class="hint">Try a different search term</p>
                 </div>

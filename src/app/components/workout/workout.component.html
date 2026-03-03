@@ -12,10 +12,10 @@
       </header>
       <!-- Add these scroll indicators inside workout-content div -->
       <div class="scroll-indicator left" id="scroll-left">
-        <i class="fas fa-chevron-left"></i>
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
       </div>
       <div class="scroll-indicator right" id="scroll-right">
-        <i class="fas fa-chevron-right"></i>
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
       </div>
       <!-- Week Calendar View - Now with horizontal scroll -->
       <div class="week-calendar">
@@ -33,7 +33,7 @@
                 }
                 <!-- Day menu toggle -->
                 <button class="btn btn-icon day-menu-toggle" (click)="toggleDayMenu(day, $event)">
-                  <i class="fas fa-ellipsis-vertical"></i>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
                 </button>
                 <!-- Day menu dropdown -->
                 @if (dayMenuOpen[day]) {
@@ -41,18 +41,18 @@
                     @if (!isRestDay(day)) {
                       <button class="menu-item"
                         (click)="startWorkout(day); $event.stopPropagation()">
-                        <i class="fas fa-play-circle"></i> Start Workout
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg> Start Workout
                       </button>
                     }
                     <button class="menu-item"
                       (click)="addExerciseToTemplate(getDayTemplate(day)); $event.stopPropagation()">
-                      <i class="fas fa-plus"></i> Add Exercise
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg> Add Exercise
                     </button>
                     <button class="menu-item" (click)="editDayNote(day); $event.stopPropagation()">
-                      <i class="fas fa-pen"></i> Edit Note
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg> Edit Note
                     </button>
                     <button class="menu-item" (click)="toggleRestDay(day); $event.stopPropagation()">
-                      <i class="fas fa-bed"></i> {{ isRestDay(day) ? 'Remove Rest Day' : 'Mark as Rest Day' }}
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg> {{ isRestDay(day) ? 'Remove Rest Day' : 'Mark as Rest Day' }}
                     </button>
                   </div>
                 }
@@ -60,7 +60,7 @@
               <!-- Day note (if exists) -->
               @if (dayNotes[day]) {
                 <div class="day-note">
-                  <i class="fas fa-sticky-note"></i>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z"/><path d="M15 3v4a2 2 0 0 0 2 2h4"/></svg>
                   <span>{{ dayNotes[day] }}</span>
                 </div>
               }
@@ -96,17 +96,17 @@
                       <div class="menu-container">
                         <button class="btn btn-icon menu-toggle"
                           (click)="toggleWorkoutMenu(exercise.id, $event); $event.stopPropagation()">
-                          <i class="fas fa-ellipsis-vertical"></i>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
                         </button>
                         @if (menuOpenMap[exercise.id]) {
                           <div class="menu-dropdown"
                             (click)="$event.stopPropagation()">
                             <button class="menu-item" (click)="editTemplateExercise(exercise)">
-                              <i class="fas fa-edit"></i> Edit
+                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg> Edit
                             </button>
                             <button class="menu-item delete-item"
                               (click)="deleteTemplateExercise(getDayTemplate(day).id, exercise.id)">
-                              <i class="fas fa-trash-alt"></i> Delete
+                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg> Delete
                             </button>
                           </div>
                         }
@@ -114,8 +114,8 @@
                     </div>
                   }
                 } @else {
-                  <div class="day-empty-state">
-                    <i class="fas fa-dumbbell"></i>
+                      <div class="day-empty-state">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>
                     <p>No exercises yet</p>
                   </div>
                 }
@@ -136,7 +136,7 @@
               <h2>{{ zoomedDay }} Exercises</h2>
               @if (dayNotes[zoomedDay]) {
                 <div class="day-note">
-                  <i class="fas fa-sticky-note"></i>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z"/><path d="M15 3v4a2 2 0 0 0 2 2h4"/></svg>
                   <span>{{ dayNotes[zoomedDay] }}</span>
                 </div>
               }
@@ -144,10 +144,10 @@
             <div class="zoom-header-actions">
               <button class="btn btn-primary add-exercise-zoom-btn"
                 (click)="addExerciseToTemplate(getDayTemplate(zoomedDay)); $event.stopPropagation()">
-                <i class="fas fa-plus"></i> Add Exercise
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg> Add Exercise
               </button>
               <button class="close-zoom-btn" (click)="closeDayZoom()">
-                <i class="fas fa-times"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
               </button>
             </div>
           </div>
@@ -181,17 +181,17 @@
                     <div class="menu-container">
                       <button class="btn btn-icon menu-toggle"
                         (click)="toggleWorkoutMenu(exercise.id, $event); $event.stopPropagation()">
-                        <i class="fas fa-ellipsis-vertical"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
                       </button>
                       @if (menuOpenMap[exercise.id]) {
                         <div class="menu-dropdown"
                           (click)="$event.stopPropagation()">
                           <button class="menu-item" (click)="editTemplateExercise(exercise)">
-                            <i class="fas fa-edit"></i> Edit
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg> Edit
                           </button>
                           <button class="menu-item delete-item"
                             (click)="deleteTemplateExercise(getDayTemplate(zoomedDay).id, exercise.id)">
-                            <i class="fas fa-trash-alt"></i> Delete
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg> Delete
                           </button>
                         </div>
                       }
@@ -211,7 +211,7 @@
             <div class="exercise-zoom-header">
               <h2>{{ getExerciseName(zoomedExercise.exercise_id) }}</h2>
               <button class="close-zoom-btn" (click)="closeExerciseDetail()">
-                <i class="fas fa-times"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
               </button>
             </div>
             <!-- Exercise Image/GIF -->
@@ -227,7 +227,7 @@
                     @for (sentence of formatInstructions(instructions); track sentence) {
                       @if (sentence.isTip) {
                         <div class="tip">
-                          <i class="fas fa-lightbulb"></i>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
                           <div class="tip-text">{{ sentence.text }}</div>
                         </div>
                       } @else {
@@ -273,16 +273,16 @@
               <div class="workout-session-info">
                 <h2>{{ activeWorkoutDay }} Workout</h2>
                 <div class="workout-timer">
-                  <i class="fas fa-stopwatch"></i>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                   <span class="timer">{{ formatWorkoutTime(workoutElapsedTime) }}</span>
                 </div>
               </div>
               <div class="workout-session-controls">
                 <button class="btn btn-minimize" (click)="minimizeWorkoutSession()" title="Minimize">
-                  <i class="fas fa-minus"></i>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
                 </button>
                 <button class="btn btn-finish" (click)="confirmFinishWorkout()">
-                  <i class="fas fa-check"></i> Finish
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Finish
                 </button>
               </div>
             </div>
@@ -307,8 +307,11 @@
                         </div>
                         <button class="btn btn-toggle-complete"
                           (click)="toggleExerciseCompletion(exercise.id)">
-                          <i class="fas" [class.fa-check-circle]="exerciseCompletionStatus[exercise.id]"
-                          [class.fa-circle]="!exerciseCompletionStatus[exercise.id]"></i>
+                          @if (exerciseCompletionStatus[exercise.id]) {
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                          } @else {
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>
+                          }
                         </button>
                       </div>
                       <!-- Sets for this exercise -->
@@ -320,8 +323,11 @@
                               <span class="set-number">Set {{ j + 1 }}</span>
                               <span class="set-details">{{ set.reps }} reps • {{ set.weight }} {{ set.weightUnit }}</span>
                               <button class="btn btn-complete-set" (click)="toggleSetCompletion(exercise.id, j)">
-                                <i class="fas" [class.fa-check-circle]="setCompletionStatus[exercise.id + '-' + j]"
-                                [class.fa-circle]="!setCompletionStatus[exercise.id + '-' + j]"></i>
+                                @if (setCompletionStatus[exercise.id + '-' + j]) {
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                } @else {
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>
+                                }
                               </button>
                             </div>
                           }
@@ -343,29 +349,29 @@
                           <div class="rest-timer-text">{{ formatRestTime(restTimeRemaining) }}</div>
                         </div>
                         <button class="btn btn-cancel-rest" (click)="cancelRestTimer()">
-                          <i class="fas fa-times"></i> Skip
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg> Skip
                         </button>
                       </div>
                     }
                     @if (!restTimerActive) {
                       <div class="rest-timer-buttons">
                         <button class="btn btn-rest" (click)="startRestTimer(30)">
-                          <i class="fas fa-stopwatch"></i> 30s
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 30s
                         </button>
                         <button class="btn btn-rest" (click)="startRestTimer(60)">
-                          <i class="fas fa-stopwatch"></i> 1m
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 1m
                         </button>
                         <button class="btn btn-rest" (click)="startRestTimer(120)">
-                          <i class="fas fa-stopwatch"></i> 2m
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 2m
                         </button>
                         <button class="btn btn-rest" (click)="startRestTimer(180)">
-                          <i class="fas fa-stopwatch"></i> 3m
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 3m
                         </button>
                         <button class="btn btn-rest" (click)="startRestTimer(300)">
-                          <i class="fas fa-stopwatch"></i> 5m
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 5m
                         </button>
                         <button class="btn btn-custom-rest" (click)="promptCustomRestTimer()">
-                          <i class="fas fa-clock"></i> Custom
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Custom
                         </button>
                       </div>
                     }
@@ -379,11 +385,11 @@
           @if (activeWorkoutDay && workoutSessionMinimized) {
             <div class="minimized-workout-indicator" (click)="maximizeWorkoutSession()">
               <div class="minimized-workout-info">
-                <i class="fas fa-dumbbell"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>
                 <span>{{ activeWorkoutDay }} - {{ formatWorkoutTime(workoutElapsedTime) }}</span>
               </div>
               <button class="btn btn-finish-mini" (click)="confirmFinishWorkout(); $event.stopPropagation()" title="Finish Workout">
-                <i class="fas fa-check"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
               </button>
             </div>
           }
@@ -394,7 +400,7 @@
               <div class="workout-completion-container">
                 <div class="completion-header">
                   <h2>Workout Complete!</h2>
-                  <i class="fas fa-trophy"></i>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
                 </div>
                 <div class="completion-stats">
                   <div class="stat-item">

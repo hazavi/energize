@@ -1,1 +1,77 @@
-<p>settings works!</p>
+<div class="settings-page">
+  <h1 class="page-title">Settings</h1>
+
+  <!-- Profile Card -->
+  <section class="card profile-card">
+    <div class="avatar">{{ userInitial }}</div>
+    <div class="profile-info">
+      <h2 class="profile-name">{{ user?.username ?? 'Unknown' }}</h2>
+      <p class="profile-email">{{ user?.email }}</p>
+      <span class="role-badge">{{ user?.role ?? 'user' }}</span>
+    </div>
+  </section>
+
+  <!-- Account Section -->
+  <section class="card">
+    <h3 class="card-heading">Account</h3>
+    <div class="setting-row" (click)="copyUserId()">
+      <div class="setting-label">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <span>User ID</span>
+      </div>
+      <span class="setting-value mono">{{ user?.userId | slice:0:12 }}…</span>
+    </div>
+    <div class="setting-row">
+      <div class="setting-label">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <span>Email</span>
+      </div>
+      <span class="setting-value">{{ user?.email }}</span>
+    </div>
+    <div class="setting-row">
+      <div class="setting-label">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>Role</span>
+      </div>
+      <span class="setting-value capitalize">{{ user?.role ?? 'user' }}</span>
+    </div>
+  </section>
+
+  <!-- App Info -->
+  <section class="card">
+    <h3 class="card-heading">About</h3>
+    <div class="setting-row">
+      <div class="setting-label">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <span>Version</span>
+      </div>
+      <span class="setting-value mono">v{{ appVersion }}</span>
+    </div>
+    <div class="setting-row">
+      <div class="setting-label">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        <span>Source</span>
+      </div>
+      <span class="setting-value">Angular 21 · Supabase</span>
+    </div>
+  </section>
+
+  <!-- Danger Zone -->
+  <section class="card danger-zone">
+    <h3 class="card-heading danger">Danger Zone</h3>
+    <button class="btn btn-logout" (click)="logout()">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Log Out
+    </button>
+    <button class="btn btn-delete" (click)="toggleDeleteConfirm()">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      Delete Account
+    </button>
+    @if (showDeleteConfirm) {
+      <div class="delete-confirm">
+        <p>This action is irreversible. Contact support to proceed with account deletion.</p>
+        <button class="btn btn-cancel" (click)="toggleDeleteConfirm()">Cancel</button>
+      </div>
+    }
+  </section>
+</div>

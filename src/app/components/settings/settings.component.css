@@ -1,0 +1,291 @@
+/* ══════════════════════════════════════════════════════════ */
+/*  Settings Page – Dark Glassmorphic                        */
+/* ══════════════════════════════════════════════════════════ */
+:host {
+  --accent: #6366f1;
+  --accent-hover: #818cf8;
+  --glass-bg: rgba(255,255,255,0.03);
+  --glass-border: rgba(255,255,255,0.06);
+  --surface: rgba(255,255,255,0.04);
+  --muted: #71717a;
+  --muted-fg: #a1a1aa;
+  --text: #f4f4f5;
+  --danger: #ef4444;
+  --radius: 12px;
+  display: block;
+}
+
+.settings-page {
+  max-width: 560px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Page Title ── */
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.025em;
+}
+
+/* ── Card ── */
+.card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 20px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.card-heading {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.card-heading.danger {
+  color: var(--danger);
+}
+
+/* ── Profile Card ── */
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #4f46e5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+  letter-spacing: -0.02em;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.profile-name {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.profile-email {
+  font-size: 0.835rem;
+  color: var(--muted-fg);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.role-badge {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: rgba(99,102,241,0.1);
+  border: 1px solid rgba(99,102,241,0.15);
+  padding: 2px 10px;
+  border-radius: 20px;
+  text-transform: capitalize;
+  width: fit-content;
+}
+
+/* ── Setting Rows ── */
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--glass-border);
+  cursor: default;
+  transition: background 150ms;
+  margin: 0 -20px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.setting-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.setting-row:first-of-type {
+  padding-top: 0;
+}
+
+.setting-row[class]:hover {
+  background: var(--surface);
+}
+
+.setting-row:first-child {
+  cursor: pointer;
+}
+
+.setting-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.setting-value {
+  font-size: 0.835rem;
+  color: var(--muted-fg);
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.setting-value.mono {
+  font-family: 'Courier New', monospace;
+  font-size: 0.78rem;
+  letter-spacing: -0.02em;
+}
+
+.setting-value.capitalize {
+  text-transform: capitalize;
+}
+
+/* ── Icons ── */
+.icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.setting-label .icon {
+  color: var(--muted-fg);
+}
+
+/* ── Buttons ── */
+.btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 150ms ease;
+  font-family: inherit;
+}
+
+.btn:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+.btn-logout {
+  margin-bottom: 8px;
+}
+
+.btn-logout:hover {
+  color: var(--danger);
+  border-color: rgba(239,68,68,0.3);
+  background: rgba(239,68,68,0.06);
+}
+
+.btn-logout:hover .icon {
+  color: var(--danger);
+}
+
+.btn-delete {
+  color: var(--danger);
+  border-color: rgba(239,68,68,0.2);
+  background: rgba(239,68,68,0.05);
+}
+
+.btn-delete:hover {
+  background: rgba(239,68,68,0.12);
+  border-color: rgba(239,68,68,0.4);
+}
+
+.btn-delete .icon {
+  color: var(--danger);
+}
+
+.btn-cancel {
+  width: auto;
+  margin-top: 8px;
+  color: var(--muted-fg);
+  padding: 8px 16px;
+}
+
+/* ── Delete Confirmation ── */
+.delete-confirm {
+  margin-top: 12px;
+  padding: 14px;
+  background: rgba(239,68,68,0.05);
+  border: 1px solid rgba(239,68,68,0.15);
+  border-radius: 8px;
+}
+
+.delete-confirm p {
+  margin: 0;
+  font-size: 0.835rem;
+  color: var(--muted-fg);
+  line-height: 1.5;
+}
+
+/* ── Danger Zone ── */
+.danger-zone {
+  border-color: rgba(239,68,68,0.1);
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .settings-page {
+    padding: 0;
+  }
+
+  .profile-card {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+
+  .profile-info {
+    align-items: center;
+  }
+
+  .setting-value {
+    max-width: 140px;
+  }
+}

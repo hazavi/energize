@@ -152,8 +152,8 @@ function parseFilters(html) {
 
       if (!value) return; // skip "All" radio (value="")
 
-      const $label = $el.find('.PM_ASLabelLink, label');
-      let labelText = $label.text().trim();
+      const $label = $el.find('.PM_ASLabelLink').first();
+      let labelText = ($label.length ? $label.text() : $el.find('label').first().text()).trim();
       // Remove the count part from the label
       const countMatch = labelText.match(/\((\d+)\)/);
       const count = countMatch ? parseInt(countMatch[1], 10) : null;

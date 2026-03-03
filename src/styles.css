@@ -1,118 +1,164 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
-:root {
-  --base-clr: #11121a;
-  --line-clr: #42434a;
-  --hover-clr: #222533;
-  --text-clr: #e6e6ef;
-  --accent-clr: #5e63ff;
-  --secondary-text-clr: #b0b3c1;
-  --card-clr: #1e1e25bc;
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
 
-  --primary: #4f46e5;
-  --primary-hover: #4338ca;
-  --secondary: #f3f4f6;
-  --text-primary: #e6e6ef;
-  --text-secondary: #e6e6ef;
+:root {
+  /* ── Core palette (zinc) ── */
+  --base-clr: #09090b;
+  --line-clr: rgba(255,255,255,0.06);
+  --hover-clr: rgba(255,255,255,0.05);
+  --text-clr: #fafafa;
+  --accent-clr: #6366f1;
+  --secondary-text-clr: #a1a1aa;
+  --card-clr: rgba(255,255,255,0.03);
+
+  /* ── Semantic aliases ── */
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --secondary: #27272a;
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
   --danger: #ef4444;
   --danger-hover: #dc2626;
-  --success: #10b981;
-  --border: #e5e7eb;
-  --admin-card-clr: #0d041b;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --border: rgba(255,255,255,0.06);
+  --admin-card-clr: rgba(255,255,255,0.025);
 
-  --transition-speed: 0.3s;
-  --primary-color: #4c6ef5;
-  --secondary-color: #495057;
-  --success-color: #37b24d;
-  --danger-color: #fa5252;
-  --light-color: #f8f9fa;
-  --dark-color: #343a40;
-  --border-radius: 6px;
-  --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  /* ── Component tokens ── */
+  --transition-speed: 0.2s;
+  --primary-color: #6366f1;
+  --secondary-color: #27272a;
+  --success-color: #22c55e;
+  --danger-color: #ef4444;
+  --light-color: #fafafa;
+  --dark-color: #18181b;
+  --border-radius: 10px;
+  --box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+
+  /* ── Glass design tokens ── */
+  --glass-bg: rgba(255,255,255,0.03);
+  --glass-border: rgba(255,255,255,0.06);
+  --glass-blur: 20px;
+  --glass-glow: 0 0 40px -12px rgba(99,102,241,0.15);
+  --radius: 10px;
+  --radius-lg: 14px;
+  --radius-sm: 6px;
+  --ring: 0 0 0 2px rgba(99,102,241,0.4);
+  --muted: #71717a;
+  --muted-foreground: #a1a1aa;
+  --surface: rgba(255,255,255,0.04);
+  --surface-hover: rgba(255,255,255,0.06);
+  --accent-subtle: rgba(99,102,241,0.1);
 }
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 body {
-  font-family: Poppins, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  line-height: 1.5rem;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.5;
   background-color: var(--base-clr);
   color: var(--text-clr);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Global Snackbar Styles - CLEANED UP VERSION */
+/* ── Subtle grain texture overlay ── */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
 
-/* Success snackbar - green */
+/* ── Utility: Glass Card ── */
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--glass-glow);
+}
+
+/* ── Snackbar Styles ── */
+
 .success-snackbar {
-  --mat-snackbar-container-color: #43a047 !important;
-  --mat-snackbar-supporting-text-color: white !important;
-  --mat-mdc-snack-bar-button-color: white !important;
+  --mat-snackbar-container-color: #22c55e !important;
+  --mat-snackbar-supporting-text-color: #fff !important;
+  --mat-mdc-snack-bar-button-color: #fff !important;
 }
 
-/* Error snackbar - red */
 .error-snackbar {
-  --mat-snackbar-container-color: #d32f2f !important;
-  --mat-snackbar-supporting-text-color: white !important;
-  --mat-mdc-snack-bar-button-color: white !important;
+  --mat-snackbar-container-color: #ef4444 !important;
+  --mat-snackbar-supporting-text-color: #fff !important;
+  --mat-mdc-snack-bar-button-color: #fff !important;
 }
 
-/* Warning snackbar - orange */
 .warning-snackbar {
-  --mat-snackbar-container-color: #ff9800 !important;
-  --mat-snackbar-supporting-text-color: white !important;
-  --mat-mdc-snack-bar-button-color: white !important;
+  --mat-snackbar-container-color: #f59e0b !important;
+  --mat-snackbar-supporting-text-color: #fff !important;
+  --mat-mdc-snack-bar-button-color: #fff !important;
 }
 
-/* Info snackbar - blue */
 .info-snackbar {
-  --mat-snackbar-container-color: #4c6ef5 !important;
-  --mat-snackbar-supporting-text-color: white !important;
-  --mat-mdc-snack-bar-button-color: white !important;
+  --mat-snackbar-container-color: #6366f1 !important;
+  --mat-snackbar-supporting-text-color: #fff !important;
+  --mat-mdc-snack-bar-button-color: #fff !important;
 }
 
-/* Default snackbar - dark gray */
 .default-snackbar {
-  --mat-snackbar-container-color: #343a40 !important;
-  --mat-snackbar-supporting-text-color: white !important;
-  --mat-mdc-snack-bar-button-color: #4c6ef5 !important;
+  --mat-snackbar-container-color: #27272a !important;
+  --mat-snackbar-supporting-text-color: #fafafa !important;
+  --mat-mdc-snack-bar-button-color: #6366f1 !important;
 }
 
-/* Common styling for all snackbars - ADAPTIVE CONTAINER SIZE */
 .mat-mdc-snack-bar-container {
   margin: 16px !important;
-  min-width: unset !important; /* Remove minimum width */
+  min-width: unset !important;
   max-width: 80vw !important;
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3) !important;
-  border-radius: 8px !important;
-  width: auto !important; /* Allow container to size to content */
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
+  border-radius: var(--radius) !important;
+  border: 1px solid rgba(255,255,255,0.06) !important;
+  width: auto !important;
+  backdrop-filter: blur(12px) !important;
 }
 
-/* Better text centering and container sizing */
 .mat-mdc-snack-bar-container .mdc-snackbar__surface {
-  padding: 14px 18px !important;
+  padding: 14px 20px !important;
   min-width: unset !important;
   width: auto !important;
   max-width: 100% !important;
   box-sizing: border-box !important;
 }
 
-/* Center the text in the snackbar */
 .mat-mdc-snack-bar-container .mdc-snackbar__label {
   text-align: center !important;
-  width: auto !important; /* Allow width to adapt to content */
+  width: auto !important;
   font-weight: 500 !important;
-  letter-spacing: 0.2px !important;
+  letter-spacing: -0.01em !important;
   padding: 0 !important;
   justify-content: center !important;
-  white-space: nowrap !important; /* Prevent wrapping for short messages */
+  white-space: nowrap !important;
   min-width: unset !important;
 }
 
-/* Center the content inside the label */
 .mat-mdc-snack-bar-container .mat-mdc-snack-bar-label {
   display: flex !important;
   justify-content: center !important;
-  width: auto !important; /* Allow width to adapt to content */
+  width: auto !important;
   min-width: unset !important;
 }
 
-/* Make sure action buttons are correctly aligned */
 .mat-mdc-snack-bar-container .mat-mdc-snack-bar-actions {
   justify-content: center !important;
   padding-top: 6px !important;
@@ -120,8 +166,36 @@ body {
   width: auto !important;
 }
 
-/* Force the snackbar container to wrap its content tightly */
 .mdc-snackbar__surface {
   display: inline-flex !important;
   flex-direction: column !important;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.14); }
+
+/* ── Selection ── */
+::selection {
+  background: rgba(99,102,241,0.3);
+  color: #fff;
+}
+
+/* ── Focus visible ring ── */
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--base-clr), 0 0 0 4px rgba(99,102,241,0.5);
+}
+
+/* ── Subtle glow keyframes ── */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px -8px rgba(99,102,241,0.2); }
+  50% { box-shadow: 0 0 30px -6px rgba(99,102,241,0.35); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
