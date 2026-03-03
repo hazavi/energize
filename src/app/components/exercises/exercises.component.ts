@@ -233,6 +233,19 @@ export class ExercisesComponent implements OnInit {
     );
   }
 
+  freezeGif(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    const canvas = img.previousElementSibling as HTMLCanvasElement;
+    if (canvas?.tagName === 'CANVAS') {
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      }
+    }
+  }
+
   handleImageError(event: Event): void {
     const img = event.target as HTMLImageElement;
     img.src = './assets/dumbbell.png';

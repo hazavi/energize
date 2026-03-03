@@ -565,28 +565,6 @@
   color: #f4f4f5;
 }
 
-/* ── Style Badge ── */
-.gymvisual-style-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 1.5rem;
-  padding: 5px 12px;
-  background: rgba(99,102,241,0.08);
-  border: 1px solid rgba(99,102,241,0.15);
-  border-radius: 20px;
-}
-
-.badge-label {
-  font-size: 0.78rem;
-  color: var(--muted-fg);
-}
-
-.badge-value {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--accent);
-}
 
 /* ── GymVisual Grid ── */
 .gymvisual-grid {
@@ -620,6 +598,17 @@
   overflow: hidden;
 }
 
+.gv-frozen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: 2;
+  transition: opacity 200ms ease;
+}
+
 .gv-gif {
   position: absolute;
   top: 0;
@@ -627,10 +616,17 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-  transition: transform 300ms ease;
+  opacity: 0;
+  z-index: 1;
+  transition: opacity 200ms ease, transform 300ms ease;
+}
+
+.gv-card:hover .gv-frozen {
+  opacity: 0;
 }
 
 .gv-card:hover .gv-gif {
+  opacity: 1;
   transform: scale(1.04);
 }
 

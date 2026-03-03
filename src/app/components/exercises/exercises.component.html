@@ -56,12 +56,6 @@
         </div>
       </div>
 
-      <!-- Style Badge (fixed to Basic Grey) -->
-      <div class="gymvisual-style-badge">
-        <span class="badge-label">Style:</span>
-        <span class="badge-value">Basic Grey</span>
-      </div>
-
       <!-- GymVisual Loading -->
       @if (gymVisualLoading) {
         <div class="loading-container">
@@ -76,8 +70,9 @@
           @for (gvExercise of gymVisualExercises; track gvExercise.id) {
             <div class="gv-card">
               <div class="gv-thumbnail">
+                <canvas class="gv-frozen"></canvas>
                 <img [src]="gvExercise.gifUrl" [alt]="gvExercise.name" class="gv-gif"
-                  (error)="handleImageError($event)" loading="lazy" />
+                  (load)="freezeGif($event)" (error)="handleImageError($event)" loading="lazy" />
               </div>
               <div class="gv-details">
                 <h4 class="gv-name" [title]="gvExercise.name">{{ gvExercise.name }}</h4>
