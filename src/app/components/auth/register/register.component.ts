@@ -8,7 +8,7 @@ import {
 import { Router, RouterModule } from '@angular/router';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { supabase } from '../../../service/supabase.service'; // Import Supabase client
+import { AuthService } from '../../../service/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -20,12 +20,13 @@ export class RegisterComponent {
   registerForm: FormGroup;
   errorMessage: string = '';
   successMessage: string = '';
-  showPassword: boolean = false; // Controls password visibility
+  showPassword: boolean = false;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private authService: AuthService
   ) {
     this.registerForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
@@ -35,7 +36,7 @@ export class RegisterComponent {
   }
 
   togglePasswordVisibility() {
-    this.showPassword = !this.showPassword; // Toggle password visibility
+    this.showPassword = !this.showPassword;
   }
 
   async onSubmit() {
@@ -46,25 +47,11 @@ export class RegisterComponent {
     const { username, email, password } = this.registerForm.value;
 
     try {
-      // Call Supabase signUp method with user metadata
-      const { data, error } = await supabase.auth.signUp({
-        email: email,
-        password: password,
-        options: {
-          data: {
-            displayName: username, // Store the username as displayName in user_metadata
-          },
-        },
-      });
-
-      if (error) {
-        throw error;
-      }
+      await this.authService.signUp(email, password, username);
 
       this.errorMessage = '';
       this.successMessage = 'Registered successfully!';
 
-      // Show success snackbar
       const snackBarRef = this.snackBar.open(
         'Registered successfully! Please check your email.',
         '',

@@ -4,6 +4,7 @@ import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { LoadingComponent } from './components/loading/loading.component';
 import { LoginResponse } from './models/loginresponse';
+import { AuthService } from './service/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -25,7 +26,8 @@ export class AppComponent {
   constructor(
     private router: Router,
     private snackBar: MatSnackBar,
-    private cdr: ChangeDetectorRef // Inject ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -82,10 +84,10 @@ export class AppComponent {
   }
 
   // Logout function
-  logout() {
+  async logout() {
     this.isLoading = true;
-    localStorage.clear(); // Clear all localStorage data
-    this.resetUI(); // Reset UI
+    await this.authService.signOut();
+    this.resetUI();
 
     setTimeout(() => {
       this.router.navigate(['/login']).then(() => {
@@ -97,9 +99,8 @@ export class AppComponent {
           panelClass: ['danger-snackbar'],
         });
 
-        // Trigger change detection to update the UI
         this.cdr.detectChanges();
       });
-    }, 2000);
+    }, 1500);
   }
 }

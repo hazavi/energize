@@ -9,8 +9,8 @@ import {
 import { Router, RouterModule } from '@angular/router';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { supabase } from '../../../service/supabase.service'; // Import Supabase client
-import { LoginResponse } from '../../../models/loginresponse'; // Import LoginResponse interface
+import { AuthService } from '../../../service/auth.service';
+import { LoginResponse } from '../../../models/loginresponse';
 
 @Component({
   selector: 'app-login',
@@ -22,14 +22,15 @@ export class LoginComponent {
   loginForm: FormGroup;
   errorMessage: string = '';
   successMessage: string = '';
-  showPassword: boolean = false; // Controls password visibility
-  isLoading: boolean = false; // Loading state
-  loginResponse: LoginResponse | null = null; // Stores the login response
+  showPassword: boolean = false;
+  isLoading: boolean = false;
+  loginResponse: LoginResponse | null = null;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private authService: AuthService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -38,7 +39,7 @@ export class LoginComponent {
   }
 
   togglePasswordVisibility() {
-    this.showPassword = !this.showPassword; // Toggle password visibility
+    this.showPassword = !this.showPassword;
   }
 
   async onSubmit() {
@@ -46,50 +47,20 @@ export class LoginComponent {
       return;
     }
 
-    this.isLoading = true; // Start loading
-
-    const loginData = this.loginForm.value;
+    this.isLoading = true;
+    const { email, password } = this.loginForm.value;
 
     try {
-      // Call Supabase to handle login
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: loginData.email,
-        password: loginData.password,
+      this.loginResponse = await this.authService.signIn(email, password);
+
+      this.errorMessage = '';
+      this.successMessage = 'You have successfully logged in!';
+      this.isLoading = false;
+      this.router.navigate(['/workout']).then(() => {
+        window.location.reload();
       });
-
-      if (error) {
-        throw error;
-      }
-
-      if (data.session) {
-        // ✅ Store the token for authentication
-        localStorage.setItem('authToken', data.session.access_token);
-
-        // Map the API response to the LoginResponse interface
-        this.loginResponse = {
-          userId: data.user.id, // Extract user ID from the response
-          username: data.user.user_metadata['displayName'] || 'User', // Extract username from metadata
-          email: data.user.email || '', // Extract email from the response or use an empty string as fallback
-          role: data.user['role'] || 'user', // Extract role from metadata
-          token: data.session.access_token, // Extract token from the session
-        };
-
-        // Save the entire login response as JSON in localStorage
-        localStorage.setItem(
-          'loginResponse',
-          JSON.stringify(this.loginResponse)
-        );
-
-        this.errorMessage = '';
-        this.successMessage = 'You have successfully logged in!';
-        this.isLoading = false; // Stop loading
-        this.router.navigate(['/workout']).then(() => {
-          window.location.reload();
-        });
-
-      }
     } catch (error: any) {
-      this.isLoading = false; // Stop loading
+      this.isLoading = false;
       this.errorMessage =
         error.message || 'Invalid credentials or an error occurred.';
       this.successMessage = '';

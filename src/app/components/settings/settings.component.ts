@@ -49,9 +49,8 @@ export class SettingsComponent implements OnInit {
     }
   }
 
-  logout(): void {
-    localStorage.clear();
-    this.authService.logout();
+  async logout(): Promise<void> {
+    await this.authService.signOut();
     this.router.navigate(['/login']);
     this.snackBar.open('Logged out successfully', '', {
       duration: 2500,
