@@ -65,7 +65,7 @@
   @if (!isLoading && paginatedExercises.length > 0) {
     <div class="gymvisual-grid">
       @for (exercise of paginatedExercises; track exercise.id) {
-        <div class="gv-card">
+        <div class="gv-card" (click)="navigateToExercise(exercise.id)">
           <div class="gv-thumbnail">
             <canvas class="gv-frozen"></canvas>
             <img [src]="exercise.gif_url" [alt]="exercise.name" class="gv-gif"

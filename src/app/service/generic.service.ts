@@ -20,7 +20,8 @@ export class GenericService<T> {
   }
 
   getById(endpoint: string, id: number): Observable<T> {
-    const headers = this.getHeaders();
+    const headers = this.getHeaders()
+      .set('Accept', 'application/vnd.pgrst.object+json');
     return this.http.get<T>(`${this.baseUrl}/${endpoint}?id=eq.${id}`, {
       headers,
     });

@@ -1,0 +1,73 @@
+@if (isLoading) {
+  <div class="detail-loading">
+    <div class="spinner"></div>
+    <p>Loading exercise...</p>
+  </div>
+}
+
+@if (!isLoading && exercise) {
+  <div class="detail-container">
+    <!-- Back Button -->
+    <button class="back-btn" (click)="goBack()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      Back to Exercises
+    </button>
+
+    <!-- Hero Section -->
+    <div class="detail-hero">
+      <div class="hero-media">
+        <img [src]="exercise.gif_url" [alt]="exercise.name"
+          (error)="handleImageError($event)" />
+      </div>
+      <div class="hero-info">
+        <h1 class="exercise-title">{{ exercise.name }}</h1>
+        <div class="meta-row">
+          @if (exercise.exercise_type) {
+            <span class="meta-chip">{{ exercise.exercise_type }}</span>
+          }
+          @for (bp of exercise.body_part; track bp) {
+            <span class="meta-chip">{{ bp }}</span>
+          }
+          @for (eq of exercise.equipment; track eq) {
+            <span class="meta-chip">{{ eq }}</span>
+          }
+        </div>
+        @if (exercise.description) {
+          <p class="exercise-description">{{ exercise.description }}</p>
+        }
+      </div>
+    </div>
+
+    <!-- Guide Section -->
+    @if (exercise.steps && exercise.steps.length > 0) {
+      <div class="guide-section">
+        <div class="guide-card">
+          <h2 class="guide-heading">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></svg>
+            How to Perform
+          </h2>
+          <ol class="steps-list">
+            @for (step of exercise.steps; track step; let i = $index) {
+              <li>
+                <span class="step-number">{{ i + 1 }}</span>
+                <span class="step-text">{{ step }}</span>
+              </li>
+            }
+          </ol>
+        </div>
+
+        @if (exercise.tip) {
+          <div class="tip-card">
+            <div class="tip-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+            </div>
+            <div class="tip-content">
+              <h3>Pro Tip</h3>
+              <p>{{ exercise.tip }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+}

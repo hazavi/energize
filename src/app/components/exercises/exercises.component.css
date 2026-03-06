@@ -583,6 +583,7 @@
   overflow: hidden;
   transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
   border: 1px solid var(--glass-border);
+  cursor: pointer;
 }
 
 .gv-card:hover {

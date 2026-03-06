@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { GenericService } from '../../service/generic.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 /** Matches the Supabase `exercises` table schema */
 export interface CatalogExercise {
@@ -11,6 +12,9 @@ export interface CatalogExercise {
   exercise_type: string;
   body_part: string[];
   equipment: string[];
+  description?: string;
+  steps?: string[];
+  tip?: string;
 }
 
 @Component({
@@ -41,7 +45,10 @@ export class ExercisesComponent implements OnInit {
   bodyPartOptions: string[] = [];
   equipmentOptions: string[] = [];
 
-  constructor(private genericService: GenericService<CatalogExercise>) {}
+  constructor(
+    private genericService: GenericService<CatalogExercise>,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.loadExercises();
@@ -190,5 +197,9 @@ export class ExercisesComponent implements OnInit {
   handleImageError(event: Event): void {
     const img = event.target as HTMLImageElement;
     img.src = './assets/dumbbell.png';
+  }
+
+  navigateToExercise(id: number): void {
+    this.router.navigate(['/exercises', id]);
   }
 }
