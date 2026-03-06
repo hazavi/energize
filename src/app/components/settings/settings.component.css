@@ -11,7 +11,7 @@
   --muted-fg: #a1a1aa;
   --text: #f4f4f5;
   --danger: #ef4444;
-  --radius: 12px;
+  --radius: 10px;
   display: block;
 }
 
@@ -20,7 +20,7 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
 /* ── Page Title ── */

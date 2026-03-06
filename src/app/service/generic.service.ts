@@ -16,7 +16,8 @@ export class GenericService<T> {
     if (options?.range) {
       headers = headers.set('Range', options.range);
     }
-    return this.http.get<T[]>(`${this.baseUrl}/${endpoint}?select=*`, { headers });
+    const separator = endpoint.includes('?') ? '&' : '?';
+    return this.http.get<T[]>(`${this.baseUrl}/${endpoint}${separator}select=*`, { headers });
   }
 
   getById(endpoint: string, id: number): Observable<T> {

@@ -2,12 +2,13 @@
 :host {
   --accent: #6366f1;
   --accent-hover: #818cf8;
-  --glass-bg: rgba(255, 255, 255, 0.04);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --surface: rgba(255, 255, 255, 0.06);
-  --muted: #a1a1aa;
-  --radius: 12px;
+  --glass-bg: rgba(255,255,255,0.03);
+  --glass-border: rgba(255,255,255,0.06);
+  --surface: rgba(255,255,255,0.04);
+  --muted: #71717a;
+  --muted-fg: #a1a1aa;
   --text: #f4f4f5;
+  --radius: 10px;
   display: block;
   height: 100%;
 }
@@ -93,14 +94,14 @@
 
 /*  Day cards  */
 .day-card {
-  flex: 0 0 340px;
+  flex: 0 0 320px;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius);
   backdrop-filter: blur(16px);
   display: flex;
   flex-direction: column;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
   cursor: pointer;
   position: relative;
   max-height: calc(100vh - 160px);
@@ -109,8 +110,8 @@
 
 .day-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  border-color: rgba(99,102,241,0.2);
 }
 
 /* Rest day */
@@ -211,13 +212,13 @@
   right: 0;
   background: rgba(24, 24, 27, 0.95);
   border: 1px solid var(--glass-border);
-  border-radius: 10px;
+  border-radius: var(--radius);
   backdrop-filter: blur(20px);
   min-width: 160px;
   z-index: 1000;
   overflow: hidden;
   animation: dropdown-fade-in 0.15s ease-out;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
 }
 
 /*  Day note  */
@@ -273,18 +274,18 @@
 .workout-card {
   background: var(--surface);
   border: 1px solid transparent;
-  border-radius: 10px;
+  border-radius: var(--radius);
   padding: 10px 12px 10px 36px;
   position: relative;
-  transition: all 0.2s;
+  transition: all 200ms ease;
   cursor: default;
   display: flex;
   align-items: center;
 }
 
 .workout-card:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(99, 102, 241, 0.2);
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(99,102,241,0.18);
   cursor: pointer;
 }
 
@@ -326,7 +327,7 @@
 
 .set-preview {
   font-size: 11px;
-  color: var(--muted);
+  color: var(--muted-fg);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -361,15 +362,15 @@
   position: absolute;
   top: 100%;
   right: 0;
-  background: rgba(24, 24, 27, 0.95);
+  background: rgba(24,24,27,0.95);
   border: 1px solid var(--glass-border);
-  border-radius: 10px;
+  border-radius: var(--radius);
   backdrop-filter: blur(20px);
   min-width: 140px;
   z-index: 1000;
   overflow: hidden;
   animation: dropdown-fade-in 0.15s ease-out;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
 }
 
 .menu-item {
@@ -417,7 +418,7 @@
 .day-empty-state p {
   margin: 0;
   font-size: 0.85rem;
-  color: var(--muted);
+  color: var(--muted-fg);
   font-weight: 500;
 }
 
@@ -457,17 +458,17 @@
 }
 
 .day-zoom-container {
-  background: rgba(24, 24, 27, 0.95);
+  background: rgba(24,24,27,0.96);
   border: 1px solid var(--glass-border);
   width: 90%;
   max-width: 600px;
   max-height: 90vh;
-  border-radius: 16px;
+  border-radius: 14px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   animation: zoom-in 0.2s ease-out;
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 24px 48px rgba(0,0,0,0.45);
   backdrop-filter: blur(24px);
 }
 
@@ -635,16 +636,16 @@ body.dragging, body.dragging * { cursor: grabbing; }
 }
 
 .exercise-zoom-container {
-  background: rgba(24, 24, 27, 0.96);
+  background: rgba(24,24,27,0.96);
   border: 1px solid var(--glass-border);
   width: 90%;
   max-width: 680px;
   max-height: 85vh;
-  border-radius: 16px;
+  border-radius: 14px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 24px 48px rgba(0,0,0,0.45);
   animation: zoom-in 0.25s cubic-bezier(0.19, 1, 0.22, 1);
   backdrop-filter: blur(24px);
 }
@@ -727,7 +728,7 @@ body.dragging, body.dragging * { cursor: grabbing; }
 .sentence {
   position: relative;
   padding: 6px 8px 6px 22px;
-  color: var(--muted);
+  color: var(--muted-fg);
   line-height: 1.7;
   font-size: 0.85em;
   font-weight: 400;
@@ -834,7 +835,7 @@ body.dragging, body.dragging * { cursor: grabbing; }
 }
 
 .set-info {
-  color: var(--muted);
+  color: var(--muted-fg);
   font-size: 0.85rem;
   font-weight: 500;
 }
@@ -872,7 +873,7 @@ body.dragging, body.dragging * { cursor: grabbing; }
   padding: 16px 20px;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  border-radius: 14px;
+  border-radius: var(--radius);
   backdrop-filter: blur(16px);
   margin-bottom: 20px;
 }
@@ -970,7 +971,7 @@ body.dragging, body.dragging * { cursor: grabbing; }
 .workout-session-exercise {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  border-radius: 14px;
+  border-radius: var(--radius);
   overflow: hidden;
   backdrop-filter: blur(12px);
   transition: all 0.3s;
@@ -1014,7 +1015,7 @@ body.dragging, body.dragging * { cursor: grabbing; }
 
 .exercise-session-sets {
   font-size: 0.8rem;
-  color: var(--muted);
+  color: var(--muted-fg);
   display: block;
   margin-top: 2px;
 }
@@ -1056,7 +1057,7 @@ body.dragging, body.dragging * { cursor: grabbing; }
 
 .set-details {
   font-size: 0.85rem;
-  color: var(--muted);
+  color: var(--muted-fg);
 }
 
 .btn-complete-set {
@@ -1075,7 +1076,7 @@ body.dragging, body.dragging * { cursor: grabbing; }
 .rest-timer-section {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  border-radius: 14px;
+  border-radius: var(--radius);
   padding: 24px;
   backdrop-filter: blur(12px);
   margin-top: 16px;
@@ -1265,14 +1266,14 @@ body.dragging, body.dragging * { cursor: grabbing; }
 }
 
 .workout-completion-container {
-  background: rgba(24, 24, 27, 0.96);
+  background: rgba(24,24,27,0.96);
   border: 1px solid var(--glass-border);
-  border-radius: 20px;
+  border-radius: 14px;
   width: 90%;
   max-width: 400px;
   padding: 36px 30px;
   backdrop-filter: blur(24px);
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 24px 48px rgba(0,0,0,0.45);
   text-align: center;
   animation: zoom-in 0.3s;
 }
@@ -1324,7 +1325,7 @@ body.dragging, body.dragging * { cursor: grabbing; }
 
 .stat-label {
   font-size: 0.8rem;
-  color: var(--muted);
+  color: var(--muted-fg);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-weight: 500;
@@ -1402,7 +1403,7 @@ body.dragging, body.dragging * { cursor: grabbing; }
 
 @media (max-width: 576px) {
   .workout-container { padding: 0.75rem; }
-  .day-card { flex: 0 0 220px; }
+  .day-card { flex: 0 0 200px; }
   .exercise-zoom-header { padding: 16px 20px; }
   .exercise-zoom-header h2 { font-size: 1rem; }
   .exercise-zoom-content-scrollable { padding: 16px; }

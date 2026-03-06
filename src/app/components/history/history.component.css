@@ -1,29 +1,32 @@
 :host {
-  --radius: 12px;
   --accent: #6366f1;
-  --glass-bg: rgba(255,255,255,0.04);
-  --glass-border: rgba(255,255,255,0.08);
-  --muted: #a1a1aa;
-  --surface: rgba(255,255,255,0.06);
+  --accent-hover: #818cf8;
+  --glass-bg: rgba(255,255,255,0.03);
+  --glass-border: rgba(255,255,255,0.06);
+  --surface: rgba(255,255,255,0.04);
+  --muted: #71717a;
+  --muted-fg: #a1a1aa;
+  --text: #f4f4f5;
+  --radius: 10px;
 }
 
 .page {
   display: flex;
   flex-direction: column;
   min-height: 100%;
-  color: #fafafa;
+  color: var(--text);
 }
 
 .section {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
 .page-title {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   font-weight: 700;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.025em;
 }
 
 /* ── Stats ── */
@@ -34,11 +37,11 @@
 }
 
 .stat-card {
-  padding: 20px;
+  padding: 18px;
   display: flex;
   align-items: center;
-  gap: 16px;
-  transition: transform 200ms;
+  gap: 14px;
+  transition: transform 200ms ease;
 }
 .stat-card:hover { transform: translateY(-2px); }
 
@@ -66,8 +69,8 @@
 }
 
 .stat-label {
-  font-size: 0.8rem;
-  color: var(--muted);
+  font-size: 0.78rem;
+  color: var(--muted-fg);
   font-weight: 500;
 }
 
@@ -187,11 +190,11 @@
   border: 1px solid var(--glass-border);
   border-radius: var(--radius);
   padding: 14px 16px;
-  transition: transform 200ms, box-shadow 200ms;
+  transition: transform 200ms ease, box-shadow 200ms ease;
 }
 .history-item:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
 }
 
 .history-item-header {
@@ -215,7 +218,7 @@
 
 .history-date .time {
   font-size: 0.8rem;
-  color: var(--muted);
+  color: var(--muted-fg);
   margin-top: 2px;
 }
 
@@ -253,13 +256,14 @@
   align-items: center;
   justify-content: center;
   padding: 48px 16px;
-  color: #52525b;
+  color: var(--muted);
   text-align: center;
   gap: 12px;
 }
 
 .empty-state p {
   font-size: 0.875rem;
+  color: var(--muted-fg);
 }
 
 /* ── Responsive ── */

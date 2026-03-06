@@ -1,15 +1,24 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { GenericService } from '../../service/generic.service';
 import { Template } from '../../models/template';
-import { Exercise } from '../../models/exercise';
-import { Set } from '../../models/set';
+import type { Set } from '../../models/set';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
-import { DomSanitizer } from '@angular/platform-browser';
-import { Category } from '../../models/category';
-import { BodyPart } from '../../models/bodypart';
 import { TemplateExercise } from '../../models/templateexercise';
+
+/** Matches the Supabase `exercises` table */
+export interface CatalogExercise {
+  id: number;
+  name: string;
+  gif_url: string;
+  exercise_type: string;
+  body_part: string[];
+  equipment: string[];
+  description?: string;
+  steps?: string;
+  tip?: string;
+}
 
 @Component({
   selector: 'app-exercise-modal',
@@ -41,88 +50,89 @@ import { TemplateExercise } from '../../models/templateexercise';
     ]),
   ],
 })
-export class ExerciseModalComponent {
-  @Input() isOpen: boolean = false;
+export class ExerciseModalComponent implements OnChanges {
+  @Input() isOpen = false;
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<TemplateExercise[]>();
   @Input() selectedTemplate: Template | null = null;
   @Input() templateExercises: {
     templateExercise: TemplateExercise;
-    exercise: Exercise;
+    exercise: CatalogExercise;
   }[] = [];
 
-  exercises: Exercise[] = [];
-  selectedExercises: Exercise[] = [];
+  exercises: CatalogExercise[] = [];
+  selectedExercises: CatalogExercise[] = [];
   isExerciseModalOpen = false;
   isLoading = false;
+  exercisesLoaded = false;
 
-  searchTerm: string = '';
-
+  searchTerm = '';
   setsMap: { [exerciseIndex: number]: Set[] } = {};
-  categories: Category[] = [];
-  bodyParts: BodyPart[] = [];
 
-  isEditing: boolean = false;
+  isEditing = false;
 
-  constructor(
-    private genericService: GenericService<any>,
-    private sanitizer: DomSanitizer
-  ) {}
+  /** Filter state */
+  filterBodyPart = '';
+  filterEquipment = '';
+  bodyPartOptions: string[] = [];
+  equipmentOptions: string[] = [];
 
-  ngOnInit(): void {
-    this.loadExercises();
-    this.loadCategories();
-    this.loadBodyParts();
+  constructor(private genericService: GenericService<any>) {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['isOpen']?.currentValue === true && !this.exercisesLoaded) {
+      this.loadExercises();
+    }
   }
 
-  get filteredExercises(): Exercise[] {
-    if (!this.searchTerm) return this.exercises;
+  get filteredExercises(): CatalogExercise[] {
+    let result = this.exercises;
+    const term = this.searchTerm.toLowerCase().trim();
 
-    return this.exercises.filter(
-      (exercise) =>
-        exercise.name?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        (exercise.id &&
-          String(exercise.id)
-            .toLowerCase()
-            .includes(this.searchTerm.toLowerCase()))
-    );
+    if (term) {
+      result = result.filter(
+        (ex) =>
+          ex.name?.toLowerCase().includes(term) ||
+          ex.exercise_type?.toLowerCase().includes(term)
+      );
+    }
+
+    if (this.filterBodyPart) {
+      result = result.filter((ex) => ex.body_part?.includes(this.filterBodyPart));
+    }
+
+    if (this.filterEquipment) {
+      result = result.filter((ex) => ex.equipment?.includes(this.filterEquipment));
+    }
+
+    return result;
   }
 
   loadExercises(): void {
     this.isLoading = true;
-
-    this.genericService.getAll('exercise').subscribe(
-      (data: Exercise[]) => {
+    this.genericService.getAll('exercises', { range: '0-9999' }).subscribe({
+      next: (data: CatalogExercise[]) => {
         this.exercises = data;
+        this.exercisesLoaded = true;
+        this.buildFilterOptions();
         this.isLoading = false;
       },
-      (error) => {
-        console.error('Error fetching exercises:', error);
+      error: (err) => {
+        console.error('Error fetching exercises:', err);
         this.isLoading = false;
-      }
-    );
+      },
+    });
   }
 
-  loadBodyParts(): void {
-    this.genericService.getAll('bodypart').subscribe(
-      (data) => {
-        this.bodyParts = data;
-      },
-      (error) => {
-        console.error('Error fetching body parts:', error);
-      }
-    );
-  }
-
-  loadCategories(): void {
-    this.genericService.getAll('category').subscribe(
-      (data) => {
-        this.categories = data;
-      },
-      (error) => {
-        console.error('Error fetching categories:', error);
-      }
-    );
+  buildFilterOptions(): void {
+    const parts = new Set<string>();
+    const equip = new Set<string>();
+    for (const ex of this.exercises) {
+      if (ex.body_part) ex.body_part.forEach((b) => parts.add(b));
+      if (ex.equipment) ex.equipment.forEach((e) => equip.add(e));
+    }
+    this.bodyPartOptions = [...parts].sort();
+    this.equipmentOptions = [...equip].sort();
   }
 
   openExerciseModal(): void {
@@ -133,14 +143,11 @@ export class ExerciseModalComponent {
     this.isExerciseModalOpen = false;
   }
 
-  toggleExerciseSelection(exercise: Exercise): void {
+  toggleExerciseSelection(exercise: CatalogExercise): void {
     const index = this.selectedExercises.findIndex((e) => e.id === exercise.id);
-
     if (index !== -1) {
-      // If already selected, remove from selection
       this.selectedExercises.splice(index, 1);
     } else {
-      // If not selected, add to selection (with a maximum limit)
       if (this.selectedExercises.length < 10) {
         this.selectedExercises.push(exercise);
       } else {
@@ -149,26 +156,23 @@ export class ExerciseModalComponent {
     }
   }
 
+  isSelected(exercise: CatalogExercise): boolean {
+    return this.selectedExercises.some((e) => e.id === exercise.id);
+  }
+
   confirmExerciseSelection(): void {
     this.templateExercises = this.selectedExercises.map((exercise) => ({
       templateExercise: {
-        id: 0, // Placeholder ID
+        id: 0,
         template_id: this.selectedTemplate?.id || 0,
         exercise_id: exercise.id,
       },
-      exercise: exercise,
+      exercise,
     }));
 
-    // Initialize setsMap for each exercise
     this.templateExercises.forEach((_, index) => {
       if (!this.setsMap[index]) {
-        this.setsMap[index] = [
-          {
-            reps: 10, // Default reps
-            weight: 20, // Default weight
-            weightUnit: 'kg', // Default weight unit
-          },
-        ];
+        this.setsMap[index] = [{ reps: 10, weight: 20, weightUnit: 'kg' }];
       }
     });
 
@@ -185,12 +189,7 @@ export class ExerciseModalComponent {
     if (!this.setsMap[exerciseIndex]) {
       this.setsMap[exerciseIndex] = [];
     }
-
-    this.setsMap[exerciseIndex].push({
-      reps: 10, // Default reps
-      weight: 20, // Default weight
-      weightUnit: 'kg', // Default weight unit
-    });
+    this.setsMap[exerciseIndex].push({ reps: 10, weight: 20, weightUnit: 'kg' });
   }
 
   toggleWeightUnit(set: Set): void {
@@ -198,22 +197,7 @@ export class ExerciseModalComponent {
   }
 
   handleImageError(event: Event): void {
-    const imgElement = event.target as HTMLImageElement;
-    imgElement.src = './assets/dumbbell.png'; // Fallback to default image
-  }
-
-  getThumbnail(thumbnail: string | null): string {
-    if (!thumbnail) {
-      return './assets/dumbbell.png'; // Fallback to default image
-    }
-
-    // Check if the thumbnail already includes the data URL prefix
-    if (thumbnail.startsWith('data:image/')) {
-      return thumbnail; // Return as-is if it's already a valid data URL
-    }
-
-    // Otherwise, prepend the correct MIME type for GIF
-    return `data:image/gif;base64,${thumbnail}`;
+    (event.target as HTMLImageElement).src = './assets/dumbbell.png';
   }
 
   saveExercises(): void {
@@ -229,7 +213,6 @@ export class ExerciseModalComponent {
 
     this.isLoading = true;
 
-    // Prepare template exercise data with sets
     const templateExercisesData: TemplateExercise[] =
       this.templateExercises.map((item, index) => ({
         id: item.templateExercise.id,
@@ -238,42 +221,26 @@ export class ExerciseModalComponent {
         sets: this.setsMap[index] || [],
       }));
 
-    // If editing existing exercise
     if (this.isEditing && templateExercisesData[0].id > 0) {
-      // Update the existing exercise
       this.genericService
-        .updateById(
-          'templateexercise',
-          templateExercisesData[0].id,
-          templateExercisesData[0]
-        )
-        .subscribe(
-          () => {
+        .updateById('templateexercise', templateExercisesData[0].id, templateExercisesData[0])
+        .subscribe({
+          next: () => {
             this.isLoading = false;
             this.save.emit(templateExercisesData);
             this.close.emit();
             this.isEditing = false;
           },
-          (error) => {
-            console.error('Error updating template exercise:', error);
+          error: (err) => {
+            console.error('Error updating template exercise:', err);
             this.isLoading = false;
             alert('Failed to update exercise. Please try again.');
-          }
-        );
+          },
+        });
     } else {
-      // Create new exercises
+      this.isLoading = false;
       this.save.emit(templateExercisesData);
       this.close.emit();
     }
-  }
-
-  getCategoryName(id: number): string {
-    const category = this.categories.find((c) => c.id === id);
-    return category ? category.name : 'Unknown';
-  }
-
-  getBodyPartName(id: number): string {
-    const part = this.bodyParts.find((p) => p.id === id);
-    return part ? part.name : 'Unknown';
   }
 }

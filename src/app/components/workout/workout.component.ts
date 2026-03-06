@@ -14,12 +14,11 @@ import { Template } from '../../models/template';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LoadingComponent } from '../loading/loading.component';
-import { WorkoutExercise } from '../../models/workoutexercise';
 import type { Set } from '../../models/set';
 import { LoginResponse } from '../../models/loginresponse';
 import { Router } from '@angular/router';
-import { Exercise } from '../../models/exercise';
 import { TemplateExercise } from '../../models/templateexercise';
+import { CatalogExercise } from '../exercise-modal/exercise-modal.component';
 import { ExerciseModalComponent } from '../exercise-modal/exercise-modal.component';
 import Sortable from 'sortablejs';
 import { NotificationService } from '../../service/notification.service';
@@ -59,9 +58,8 @@ export class WorkoutComponent implements OnInit, AfterViewInit {
   isWorkoutModalOpen = false;
   selectedTemplate: Template | null = null;
   selectedWorkout: Workout | null = null;
-  workoutExercises: any[] = [];
   setsMap: { [exerciseIndex: number]: Set[] } = {};
-  exercises: Exercise[] = [];
+  exercises: CatalogExercise[] = [];
 
   menuPositions: { [key: number]: { top: number; left: number } } = {};
 
@@ -73,7 +71,7 @@ export class WorkoutComponent implements OnInit, AfterViewInit {
 
   templateExercises: {
     templateExercise: TemplateExercise;
-    exercise: Exercise;
+    exercise: CatalogExercise;
   }[] = [];
 
   templateExercisesMap: { [templateId: number]: TemplateExercise[] } = {};
@@ -165,16 +163,16 @@ export class WorkoutComponent implements OnInit, AfterViewInit {
   loadExercises(): void {
     this.isLoading = true;
 
-    this.genericService.getAll('exercise').subscribe(
-      (data: Exercise[]) => {
+    this.genericService.getAll('exercises', { range: '0-9999' }).subscribe({
+      next: (data: CatalogExercise[]) => {
         this.exercises = data;
         this.isLoading = false;
       },
-      (error) => {
-        console.error('Error fetching exercises:', error);
+      error: (err) => {
+        console.error('Error fetching exercises:', err);
         this.isLoading = false;
-      }
-    );
+      },
+    });
   }
   private loadDayTemplates(): void {
     if (!this.user) {
@@ -360,46 +358,6 @@ export class WorkoutComponent implements OnInit, AfterViewInit {
     }
   }
 
-  addExerciseToWorkout(workout: Workout): void {
-    if (!workout) return;
-
-    if (workout.exercises && workout.exercises.length >= 10) {
-      alert('You can only add up to 10 exercises per workout.');
-      return;
-    }
-
-    const exerciseId = prompt('Enter exercise ID:');
-    if (!exerciseId) return;
-
-    const newWorkoutExercise: WorkoutExercise = {
-      id: Date.now(),
-      workout_id: workout.id,
-      exercise_id: +exerciseId,
-    };
-
-    this.genericService.create('workoutexercise', newWorkoutExercise).subscribe(
-      (workoutExercise: WorkoutExercise) => {
-        if (!workout.exercises) workout.exercises = [];
-        workout.exercises.push(workoutExercise);
-
-        const exerciseIndex = workout.exercises.length - 1;
-        this.setsMap[exerciseIndex] = [
-          {
-            reps: 10,
-            weight: 20,
-            weightUnit: 'kg',
-          },
-        ];
-
-        console.log('Exercise added successfully:', workoutExercise);
-      },
-      (error) => {
-        console.error('Error adding exercise:', error);
-        alert('Failed to add exercise. Please try again.');
-      }
-    );
-  }
-
   addExerciseToTemplate(template: Template): void {
     if (!template) {
       alert('Template not found.');
@@ -572,28 +530,12 @@ export class WorkoutComponent implements OnInit, AfterViewInit {
 
   getExerciseThumbnail(exerciseId: number): string {
     const exercise = this.exercises.find((e) => e.id === exerciseId);
-    if (exercise?.thumbnail) {
-      // Check if the thumbnail already includes the data URL prefix
-      if (exercise.thumbnail.startsWith('data:image/')) {
-        return exercise.thumbnail; // Return as-is if it's already a valid data URL
-      }
-      // Otherwise, prepend the correct MIME type for GIF
-      return `data:image/gif;base64,${exercise.thumbnail}`;
-    }
-    return './assets/dumbbell.png';
+    return exercise?.gif_url || './assets/dumbbell.png';
   }
 
   getExerciseFullImage(exerciseId: number): string {
     const exercise = this.exercises.find((e) => e.id === exerciseId);
-    if (exercise?.thumbnail) {
-      // Check if the thumbnail already includes the data URL prefix
-      if (exercise.thumbnail.startsWith('data:image/')) {
-        return exercise.thumbnail; // Return as-is if it's already a valid data URL
-      }
-      // Otherwise, prepend the correct MIME type for GIF
-      return `data:image/gif;base64,${exercise.thumbnail}`;
-    }
-    return './assets/dumbbell.png';
+    return exercise?.gif_url || './assets/dumbbell.png';
   }
 
   getSetsPreview(exercise: TemplateExercise): string {
@@ -631,9 +573,7 @@ export class WorkoutComponent implements OnInit, AfterViewInit {
   }
   getExerciseInstructions(id: number): string {
     const exercise = this.exercises.find((p) => p.id === id);
-    return exercise && exercise.instructions
-      ? exercise.instructions
-      : 'Unknown';
+    return exercise?.description || '';
   }
 
   handleImageError(event: Event): void {
@@ -663,7 +603,6 @@ export class WorkoutComponent implements OnInit, AfterViewInit {
   editTemplateExercise(exercise: TemplateExercise): void {
     this.selectedTemplate = this.findTemplateByExerciseId(exercise.template_id);
 
-    // Get the exercise details
     const exerciseDetails = this.exercises.find(
       (e) => e.id === exercise.exercise_id
     );
@@ -672,7 +611,6 @@ export class WorkoutComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    // Setup the exercise for editing
     this.templateExercises = [
       {
         templateExercise: exercise,

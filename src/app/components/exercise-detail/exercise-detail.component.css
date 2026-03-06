@@ -1,13 +1,14 @@
 :host {
   --accent: #6366f1;
-  --accent-subtle: rgba(99, 102, 241, 0.12);
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.06);
-  --surface: rgba(255, 255, 255, 0.04);
+  --accent-hover: #818cf8;
+  --accent-subtle: rgba(99,102,241,0.12);
+  --glass-bg: rgba(255,255,255,0.03);
+  --glass-border: rgba(255,255,255,0.06);
+  --surface: rgba(255,255,255,0.04);
   --muted: #71717a;
   --muted-fg: #a1a1aa;
   --text: #f4f4f5;
-  --radius: 12px;
+  --radius: 10px;
   display: block;
 }
 
