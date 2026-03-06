@@ -11,9 +11,12 @@ export class GenericService<T> {
 
   constructor(private http: HttpClient) {}
 
-  getAll(endpoint: string): Observable<T[]> {
-    const headers = this.getHeaders();
-    return this.http.get<T[]>(`${this.baseUrl}/${endpoint}`, { headers });
+  getAll(endpoint: string, options?: { range?: string }): Observable<T[]> {
+    let headers = this.getHeaders();
+    if (options?.range) {
+      headers = headers.set('Range', options.range);
+    }
+    return this.http.get<T[]>(`${this.baseUrl}/${endpoint}?select=*`, { headers });
   }
 
   getById(endpoint: string, id: number): Observable<T> {

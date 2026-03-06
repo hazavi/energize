@@ -1,125 +1,59 @@
 import { Component, OnInit } from '@angular/core';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { GenericService } from '../../service/generic.service';
-import { GymVisualService } from '../../service/gymvisual.service';
-import { Exercise } from '../../models/exercise';
-import { BodyPart } from '../../models/bodypart';
-import { Category } from '../../models/category';
-import {
-  GymVisualExercise,
-  GymVisualFilters,
-  GymVisualFilterOption,
-  GymVisualPagination,
-} from '../../models/gymvisual';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { LoadingComponent } from '../loading/loading.component';
+/** Matches the Supabase `exercises` table schema */
+export interface CatalogExercise {
+  id: number;
+  name: string;
+  gif_url: string;
+  exercise_type: string;
+  body_part: string[];
+  equipment: string[];
+}
 
 @Component({
   selector: 'app-exercises',
-  imports: [FormsModule, ReactiveFormsModule],
+  standalone: true,
+  imports: [FormsModule, CommonModule],
   templateUrl: './exercises.component.html',
   styleUrls: ['./exercises.component.css'],
 })
 export class ExercisesComponent implements OnInit {
-  exercises: Exercise[] = [];
-  filteredExercises: Exercise[] = [];
-  bodyParts: BodyPart[] = [];
-  categories: Category[] = [];
-  isLoading: boolean = false;
-  currentPage: number = 1;
-  pageSize: number = 20;
+  /** All exercises loaded from Supabase */
+  allExercises: CatalogExercise[] = [];
+  /** Filtered subset */
+  filteredExercises: CatalogExercise[] = [];
 
-  // Search and filter properties
-  searchTerm: string = '';
-  selectedBodyPart: number = 0; // 0 means all
-  selectedCategory: number = 0; // 0 means all
+  isLoading = false;
+  searchTerm = '';
+  currentPage = 1;
+  pageSize = 20;
 
-  // GymVisual properties
-  gymVisualExercises: GymVisualExercise[] = [];
-  gymVisualFilters!: GymVisualFilters;
-  gymVisualPagination: GymVisualPagination = { currentPage: 1, totalPages: 1, totalItems: 0 };
-  gymVisualLoading: boolean = false;
-  selectedExerciseType: number = 69; // Default: Strength
-  selectedGymBodyPart: number = 0; // 0 means all
-  selectedEquipmentType: number = 0; // 0 means all
-  selectedGender: number = 49; // Default: Male
-  gymVisualPage: number = 1;
+  /** Filter state */
+  selectedExerciseType = '';
+  selectedBodyPart = '';
+  selectedEquipment = '';
 
-  constructor(
-    private genericService: GenericService<any>,
-    private sanitizer: DomSanitizer,
-    private gymVisualService: GymVisualService
-  ) {}
+  /** Distinct filter options (populated from data) */
+  exerciseTypeOptions: string[] = [];
+  bodyPartOptions: string[] = [];
+  equipmentOptions: string[] = [];
+
+  constructor(private genericService: GenericService<CatalogExercise>) {}
 
   ngOnInit(): void {
-    this.loadBodyParts();
-    this.loadCategories();
     this.loadExercises();
-    this.loadGymVisualData();
-  }
-
-  loadGymVisualData(): void {
-    this.selectedGender = this.gymVisualService.getDefaultGender();
-
-    // Load filter options
-    this.gymVisualService.getFilters().subscribe({
-      next: (filters) => {
-        this.gymVisualFilters = filters;
-      },
-      error: (err) => console.error('Error loading GymVisual filters:', err),
-    });
-
-    // Load initial exercises
-    this.fetchGymVisualExercises();
-  }
-
-  fetchGymVisualExercises(): void {
-    this.gymVisualLoading = true;
-    this.gymVisualService
-      .searchExercises(
-        this.selectedGender,
-        this.selectedExerciseType,
-        this.selectedGymBodyPart,
-        this.selectedEquipmentType,
-        this.gymVisualPage,
-        this.pageSize
-      )
-      .subscribe({
-        next: (response) => {
-          this.gymVisualExercises = response.exercises;
-          if (response.pagination) {
-            this.gymVisualPagination = response.pagination;
-          }
-          this.gymVisualLoading = false;
-        },
-        error: (err) => {
-          console.error('Error fetching GymVisual exercises:', err);
-          this.gymVisualLoading = false;
-        },
-      });
   }
 
   loadExercises(): void {
     this.isLoading = true;
-    this.genericService.getAll('exercise').subscribe({
-      next: (exercises) => {
-        let processedExercises = exercises.map((exercise: Exercise) => {
-          return {
-            ...exercise,
-            base64Thumbnail: exercise.thumbnail || './assets/dumbbell.png',
-            thumbnail: exercise.thumbnail || '',
-            sortKey: generateSortKey(exercise.id),
-          };
-        });
-
-        // Sort by the deterministic sort key
-        processedExercises.sort(
-          (a: any, b: any) => a.sortKey - b.sortKey
-        );
-
-        this.exercises = processedExercises;
-        this.filteredExercises = [...this.exercises];
+    this.genericService.getAll('exercises', { range: '0-9999' }).subscribe({
+      next: (data) => {
+        this.allExercises = data;
+        this.buildFilterOptions();
+        this.applyFilters();
         this.isLoading = false;
       },
       error: (err) => {
@@ -129,110 +63,119 @@ export class ExercisesComponent implements OnInit {
     });
   }
 
-  loadBodyParts(): void {
-    this.isLoading = true;
-    this.genericService.getAll('bodypart').subscribe(
-      (data) => {
-        this.bodyParts = data;
-        this.isLoading = false;
-      },
-      (error) => {
-        console.error('Error fetching body parts:', error);
-        this.isLoading = false;
-      }
-    );
+  /** Extract distinct filter values from loaded data */
+  buildFilterOptions(): void {
+    const types = new Set<string>();
+    const parts = new Set<string>();
+    const equip = new Set<string>();
+
+    for (const ex of this.allExercises) {
+      if (ex.exercise_type) types.add(ex.exercise_type);
+      if (ex.body_part) ex.body_part.forEach((bp) => parts.add(bp));
+      if (ex.equipment) ex.equipment.forEach((eq) => equip.add(eq));
+    }
+
+    this.exerciseTypeOptions = [...types].sort();
+    this.bodyPartOptions = [...parts].sort();
+    this.equipmentOptions = [...equip].sort();
   }
 
-  loadCategories(): void {
-    this.isLoading = true;
-    this.genericService.getAll('category').subscribe(
-      (data) => {
-        this.categories = data;
-        this.isLoading = false;
-      },
-      (error) => {
-        console.error('Error fetching categories:', error);
-        this.isLoading = false;
-      }
-    );
-  }
-
+  /** Apply all active filters + search together */
   applyFilters(): void {
-    // Reset pagination when applying filters
     this.currentPage = 1;
+    let result = [...this.allExercises];
 
-    // Start with all exercises
-    let result = [...this.exercises];
-
-    // Apply search term filter
-    if (this.searchTerm && this.searchTerm.trim() !== '') {
-      const term = this.searchTerm.toLowerCase().trim();
-      result = result.filter(
-        (exercise) =>
-          exercise.name.toLowerCase().includes(term) ||
-          this.getBodyPartName(exercise.bodypart_id)
-            .toLowerCase()
-            .includes(term) ||
-          this.getCategoryName(exercise.category_id)
-            .toLowerCase()
-            .includes(term)
-      );
+    // Search
+    const term = this.searchTerm.toLowerCase().trim();
+    if (term) {
+      result = result.filter((ex) => ex.name.toLowerCase().includes(term));
     }
 
-    // Apply body part filter - ensure numeric comparison
-    if (this.selectedBodyPart > 0) {
-      const bodyPartId = Number(this.selectedBodyPart);
-      result = result.filter(
-        (exercise) => Number(exercise.bodypart_id) === bodyPartId
-      );
+    // Exercise type
+    if (this.selectedExerciseType) {
+      result = result.filter((ex) => ex.exercise_type === this.selectedExerciseType);
     }
 
-    // Apply category filter - ensure numeric comparison
-    if (this.selectedCategory > 0) {
-      const categoryId = Number(this.selectedCategory);
-      result = result.filter(
-        (exercise) => Number(exercise.category_id) === categoryId
-      );
+    // Body part (array contains)
+    if (this.selectedBodyPart) {
+      result = result.filter((ex) => ex.body_part?.includes(this.selectedBodyPart));
     }
 
-    // Update filtered exercises
+    // Equipment (array contains)
+    if (this.selectedEquipment) {
+      result = result.filter((ex) => ex.equipment?.includes(this.selectedEquipment));
+    }
+
     this.filteredExercises = result;
-
-    // Also filter GymVisual exercises
-    this.applyGymVisualFilters();
-  }
-
-  applyGymVisualFilters(): void {
-    this.gymVisualPage = 1;
-    this.fetchGymVisualExercises();
   }
 
   clearFilters(): void {
     this.searchTerm = '';
-    this.selectedBodyPart = 0;
-    this.selectedCategory = 0;
-    this.selectedExerciseType = 69;
-    this.selectedGymBodyPart = 0;
-    this.selectedEquipmentType = 0;
-    this.selectedGender = 49;
-    this.filteredExercises = [...this.exercises];
-    this.currentPage = 1;
-    this.gymVisualPage = 1;
-    this.fetchGymVisualExercises();
+    this.selectedExerciseType = '';
+    this.selectedBodyPart = '';
+    this.selectedEquipment = '';
+    this.applyFilters();
   }
 
   get hasActiveFilters(): boolean {
     return (
       this.searchTerm.trim() !== '' ||
-      this.selectedBodyPart > 0 ||
-      this.selectedCategory > 0 ||
-      this.selectedExerciseType !== 69 ||
-      this.selectedGymBodyPart > 0 ||
-      this.selectedEquipmentType > 0 ||
-      this.selectedGender !== 49
+      this.selectedExerciseType !== '' ||
+      this.selectedBodyPart !== '' ||
+      this.selectedEquipment !== ''
     );
   }
 
+  /** Paginated slice for current page */
+  get paginatedExercises(): CatalogExercise[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.filteredExercises.slice(start, start + this.pageSize);
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.filteredExercises.length / this.pageSize);
+  }
+
+  get totalItems(): number {
+    return this.filteredExercises.length;
+  }
+
+  changePage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  getDisplayedPageNumbers(): number[] {
+    const total = this.totalPages;
+    const current = this.currentPage;
+    const maxVisible = 5;
+
+    if (total <= maxVisible) {
+      return Array.from({ length: total }, (_, i) => i + 1);
+    }
+
+    const pages: number[] = [1];
+    if (current > 3) pages.push(-1);
+
+    let start = Math.max(2, current - 1);
+    let end = Math.min(total - 1, current + 1);
+
+    if (current <= 3) end = Math.min(total - 1, 4);
+    else if (current >= total - 2) start = Math.max(2, total - 3);
+
+    for (let i = start; i <= end; i++) {
+      if (i !== 1 && i !== total) pages.push(i);
+    }
+
+    if (current < total - 2) pages.push(-1);
+    if (total > 1) pages.push(total);
+
+    return pages;
+  }
+
+  /** Freeze GIF first frame onto preceding <canvas> */
   freezeGif(event: Event): void {
     const img = event.target as HTMLImageElement;
     const canvas = img.previousElementSibling as HTMLCanvasElement;
@@ -240,9 +183,7 @@ export class ExercisesComponent implements OnInit {
       canvas.width = img.naturalWidth;
       canvas.height = img.naturalHeight;
       const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      }
+      if (ctx) ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     }
   }
 
@@ -250,141 +191,4 @@ export class ExercisesComponent implements OnInit {
     const img = event.target as HTMLImageElement;
     img.src = './assets/dumbbell.png';
   }
-
-  getBodyPartName(id: number): string {
-    const part = this.bodyParts.find((p) => p.id === id);
-    return part ? part.name : 'Unknown';
-  }
-
-  getCategoryName(id: number): string {
-    const category = this.categories.find((c) => c.id === id);
-    return category ? category.name : 'Unknown';
-  }
-
-  getGymBodyPartName(id: number): string {
-    if (!this.gymVisualFilters) return '';
-    const part = this.gymVisualFilters.bodyParts.find((p) => p.id === id);
-    return part ? part.name : '';
-  }
-
-  getEquipmentName(id: number): string {
-    if (!this.gymVisualFilters) return '';
-    const eq = this.gymVisualFilters.equipmentTypes.find((e) => e.id === id);
-    return eq ? eq.name : '';
-  }
-
-  getExerciseTypeName(id: number): string {
-    if (!this.gymVisualFilters) return '';
-    const et = this.gymVisualFilters.exerciseTypes.find((e) => e.id === id);
-    return et ? et.name : '';
-  }
-
-  getGenderName(id: number): string {
-    if (!this.gymVisualFilters) return 'Male';
-    const g = this.gymVisualFilters.genders.find((g) => g.id === id);
-    return g ? g.name : 'Male';
-  }
-
-  get paginatedExercises(): Exercise[] {
-    const startIndex = (this.currentPage - 1) * this.pageSize;
-    const endIndex = startIndex + this.pageSize;
-    return this.filteredExercises.slice(startIndex, endIndex);
-  }
-
-  get gymVisualTotalPages(): number {
-    return this.gymVisualPagination.totalPages;
-  }
-
-  get gymVisualTotalItems(): number {
-    return this.gymVisualPagination.totalItems;
-  }
-
-  changeGymVisualPage(page: number): void {
-    if (page >= 1 && page <= this.gymVisualTotalPages) {
-      this.gymVisualPage = page;
-      this.fetchGymVisualExercises();
-    }
-  }
-
-  changeGymVisualPageAndScroll(page: number): void {
-    if (page >= 1 && page <= this.gymVisualTotalPages) {
-      this.gymVisualPage = page;
-      this.fetchGymVisualExercises();
-      this.scrollToTop();
-    }
-  }
-
-  changePage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-    }
-  }
-
-  changePageAndScroll(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-      this.scrollToTop();
-    }
-  }
-
-  get totalPages(): number {
-    return Math.ceil(this.filteredExercises.length / this.pageSize);
-  }
-
-  scrollToTop(): void {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  getGymVisualDisplayedPageNumbers(): number[] {
-    return this._getPageNumbers(this.gymVisualTotalPages, this.gymVisualPage);
-  }
-
-  getDisplayedPageNumbers(): number[] {
-    return this._getPageNumbers(this.totalPages, this.currentPage);
-  }
-
-  private _getPageNumbers(totalPages: number, currentPage: number): number[] {
-    const maxPagesVisible = 5;
-
-    if (totalPages <= maxPagesVisible) {
-      return Array.from({ length: totalPages }, (_, i) => i + 1);
-    }
-
-    const pages: number[] = [];
-    pages.push(1);
-
-    if (currentPage > 3) {
-      pages.push(-1);
-    }
-
-    let startPage = Math.max(2, currentPage - 1);
-    let endPage = Math.min(totalPages - 1, currentPage + 1);
-
-    if (currentPage <= 3) {
-      endPage = Math.min(totalPages - 1, 4);
-    } else if (currentPage >= totalPages - 2) {
-      startPage = Math.max(2, totalPages - 3);
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      if (i !== 1 && i !== totalPages) {
-        pages.push(i);
-      }
-    }
-
-    if (currentPage < totalPages - 2) {
-      pages.push(-1);
-    }
-
-    if (totalPages > 1) {
-      pages.push(totalPages);
-    }
-
-    return pages;
-  }
-}
-
-function generateSortKey(id: number): number {
-  const seed = id * 9301 + 49297;
-  return (seed % 233280) / 233280;
 }

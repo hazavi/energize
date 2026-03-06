@@ -3,9 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "proxy": "node server/gymvisual-proxy.js",
     "start": "ng serve",
-    "start:all": "concurrently \"npm run proxy\" \"ng serve\"",
     "build": "node generate-env.js && ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
@@ -47,6 +45,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "pg": "^8.19.0",
     "typescript": "^5.9.3"
   }
 }
