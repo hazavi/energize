@@ -1,128 +1,104 @@
-<div class="page">
+﻿<div class="history-container">
   @if (isLoading) {
     <app-loading></app-loading>
   }
 
   @if (!isLoading) {
-    <div class="section">
-      <h1 class="page-title">Workout History</h1>
+    <header class="history-header">
+      <h2 class="section-title">Workout History</h2>
+    </header>
 
-      <!-- Stats -->
-      <div class="stats-row">
-        <div class="stat-card glass">
-          <div class="stat-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767-1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l1.767 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg>
-          </div>
-          <div class="stat-info">
-            <span class="stat-value">{{ totalWorkouts }}</span>
-            <span class="stat-label">Total Workouts</span>
-          </div>
-        </div>
-        <div class="stat-card glass">
-          <div class="stat-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          </div>
-          <div class="stat-info">
-            <span class="stat-value">{{ formatDuration(totalDuration) }}</span>
-            <span class="stat-label">Total Time</span>
-          </div>
-        </div>
-        <div class="stat-card glass">
-          <div class="stat-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-          </div>
-          <div class="stat-info">
-            <span class="stat-value">{{ formatDuration(averageWorkoutTime) }}</span>
-            <span class="stat-label">Avg. Workout</span>
-          </div>
-        </div>
-        <div class="stat-card glass">
-          <div class="stat-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></svg>
-          </div>
-          <div class="stat-info">
-            <span class="stat-value">{{ mostActiveDay }}</span>
-            <span class="stat-label">Most Active Day</span>
-          </div>
-        </div>
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>
+        <span class="stat-value">{{ totalWorkouts }}</span>
+        <span class="stat-label">Workouts</span>
+      </div>
+      <div class="stat-card">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span class="stat-value">{{ formatDuration(totalDuration) }}</span>
+        <span class="stat-label">Total Time</span>
+      </div>
+      <div class="stat-card">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></svg>
+        <span class="stat-value">{{ formatDuration(averageWorkoutTime) }}</span>
+        <span class="stat-label">Avg Time</span>
+      </div>
+      <div class="stat-card">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+        <span class="stat-value">{{ mostActiveDay }}</span>
+        <span class="stat-label">Most Active</span>
+      </div>
+    </div>
+
+    <!-- Calendar -->
+    <div class="calendar-section">
+      <div class="calendar-nav">
+        <button class="btn-nav" (click)="changeMonth(-1)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <span class="calendar-month">{{ months[filterMonth] }} {{ filterYear }}</span>
+        <button class="btn-nav" (click)="changeMonth(1)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
       </div>
 
-      <!-- Calendar -->
-      <div class="calendar-card glass">
-        <div class="calendar-header">
-          <button class="btn-ghost" (click)="changeMonth(-1)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-          </button>
-          <h3 class="calendar-title">{{ months[filterMonth] }} {{ filterYear }}</h3>
-          <button class="btn-ghost" (click)="changeMonth(1)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-          </button>
-        </div>
-        <div class="calendar-grid">
-          <div class="calendar-weekdays">
-            <div class="weekday">Mon</div>
-            <div class="weekday">Tue</div>
-            <div class="weekday">Wed</div>
-            <div class="weekday">Thu</div>
-            <div class="weekday">Fri</div>
-            <div class="weekday">Sat</div>
-            <div class="weekday">Sun</div>
-          </div>
-          <div class="calendar-days">
-            @for (date of getDaysInMonth(filterMonth, filterYear); track date) {
-              <div class="calendar-day"
-                [class.current-month]="isCurrentMonth(date)"
-                [class.today]="isToday(date)"
-                [class.activity-day]="getCalendarActivity(date)">
-                <span class="day-number">{{ date.getDate() }}</span>
-              </div>
-            }
-          </div>
-        </div>
-      </div>
+      <div class="calendar-grid">
+        <div class="cal-header">Sun</div>
+        <div class="cal-header">Mon</div>
+        <div class="cal-header">Tue</div>
+        <div class="cal-header">Wed</div>
+        <div class="cal-header">Thu</div>
+        <div class="cal-header">Fri</div>
+        <div class="cal-header">Sat</div>
 
-      <!-- Recent Workouts -->
-      <div class="list-card glass">
-        <h3 class="section-subtitle">Recent Workouts</h3>
-        @if (filteredHistory.length > 0) {
-          <div class="history-list">
-            @for (workout of filteredHistory; track workout) {
-              <div class="history-item">
-                <div class="history-item-header">
-                  <div class="history-date">
-                    <span class="day">{{ formatDate(workout.date) }}</span>
-                    <span class="time">{{ formatDuration(workout.duration) }}</span>
-                  </div>
-                  <button class="btn-ghost-sm" (click)="deleteWorkout(workout.id!)">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                  </button>
-                </div>
-                <div class="history-item-details">
-                  <div class="history-detail">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
-                    <span>{{ workout.day }} Workout</span>
-                  </div>
-                  <div class="history-detail">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
-                    <span>{{ workout.exercises_completed }}/{{ workout.total_exercises }} Exercises</span>
-                  </div>
-                  @if (workout.notes) {
-                    <div class="history-detail">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z"/><path d="M15 3v4a2 2 0 0 0 2 2h4"/></svg>
-                      <span>{{ workout.notes }}</span>
-                    </div>
-                  }
-                </div>
-              </div>
+        @for (day of getDaysInMonth(filterMonth, filterYear); track day) {
+          <div class="cal-day"
+            [class.other-month]="!isCurrentMonth(day)"
+            [class.today]="isToday(day)"
+            [class.has-workout]="getCalendarActivity(day)">
+            <span class="cal-day-num">{{ day.getDate() }}</span>
+            @if (getCalendarActivity(day); as activity) {
+              <div class="cal-dot" [title]="activity.count + ' workout(s)'"></div>
             }
-          </div>
-        } @else {
-          <div class="empty-state">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#3f3f46" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            <p>No workout records for {{ months[filterMonth] }} {{ filterYear }}</p>
           </div>
         }
       </div>
     </div>
+
+    <!-- Recent Workouts -->
+    <div class="recent-section">
+      <h3 class="sub-title">{{ months[filterMonth] }} Workouts</h3>
+
+      @if (filteredHistory.length === 0) {
+        <div class="empty-state">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+          <p>No workouts this month</p>
+        </div>
+      }
+
+      @for (workout of filteredHistory; track workout.id) {
+        <div class="history-card">
+          <div class="history-info">
+            <div class="history-day">{{ workout.day }}</div>
+            <div class="history-meta">
+              <span class="history-date">{{ formatDate(workout.date) }}</span>
+              <span class="dot">·</span>
+              <span>{{ formatDuration(workout.duration) }}</span>
+              <span class="dot">·</span>
+              <span>{{ workout.exercises_completed }}/{{ workout.total_exercises }} exercises</span>
+            </div>
+            @if (workout.notes) {
+              <div class="history-notes">{{ workout.notes }}</div>
+            }
+          </div>
+          <button class="btn-delete" (click)="deleteWorkout(workout.id!)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+          </button>
+        </div>
+      }
+    </div>
   }
 </div>
+

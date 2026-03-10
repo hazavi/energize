@@ -1,0 +1,420 @@
+<div class="workout-container">
+  <!-- Loading Indicator -->
+  @if (isLoading) {
+    <app-loading></app-loading>
+  }
+
+  <!-- Main Content -->
+  @if (!isLoading) {
+    <div class="workout-content">
+      <header class="workout-header">
+        <h2 class="section-title">Weekly Workout Plan</h2>
+      </header>
+      <!-- Add these scroll indicators inside workout-content div -->
+      <div class="scroll-indicator left" id="scroll-left">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      </div>
+      <div class="scroll-indicator right" id="scroll-right">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+      </div>
+      <!-- Week Calendar View - Now with horizontal scroll -->
+      <div class="week-calendar">
+        <!-- Day Cards for Each Day of the Week -->
+        @for (day of weekDays; track day) {
+          <div class="day-card" [id]="'day-' + day"
+            [class.rest-day]="isRestDay(day)"
+            (click)="openDayZoom(day)">
+            <!-- Day Header with Menu and Note -->
+            <div class="day-header" [ngClass]="{'today': isToday(day)}">
+              <div class="day-header-top">
+                <h3 class="day-title">{{ day }}</h3>
+                @if (isToday(day)) {
+                  <span class="day-date">Today</span>
+                }
+                <!-- Day menu toggle -->
+                <button class="btn btn-icon day-menu-toggle" (click)="toggleDayMenu(day, $event)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                </button>
+                <!-- Day menu dropdown -->
+                @if (dayMenuOpen[day]) {
+                  <div class="day-menu-dropdown" (click)="$event.stopPropagation()">
+                    @if (!isRestDay(day)) {
+                      <button class="menu-item"
+                        (click)="startWorkout(day); $event.stopPropagation()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg> Start Workout
+                      </button>
+                    }
+                    <button class="menu-item"
+                      (click)="addExerciseToTemplate(getDayTemplate(day)); $event.stopPropagation()">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg> Add Exercise
+                    </button>
+                    <button class="menu-item" (click)="editDayNote(day); $event.stopPropagation()">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg> Edit Note
+                    </button>
+                    <button class="menu-item" (click)="toggleRestDay(day); $event.stopPropagation()">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg> {{ isRestDay(day) ? 'Remove Rest Day' : 'Mark as Rest Day' }}
+                    </button>
+                  </div>
+                }
+              </div>
+              <!-- Day note (if exists) -->
+              @if (dayNotes[day]) {
+                <div class="day-note">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z"/><path d="M15 3v4a2 2 0 0 0 2 2h4"/></svg>
+                  <span>{{ dayNotes[day] }}</span>
+                </div>
+              }
+            </div>
+            <!-- Exercises List for this Day -->
+            <div class="workout-list">
+              @if (getExercisesForDay(day).length) {
+                @for (exercise of getExercisesForDay(day); track exercise) {
+                  <div class="workout-card"
+                    [attr.data-exercise-id]="exercise.id"
+                    (click)="openExerciseDetail(exercise); $event.stopPropagation()">
+                    <!-- Simplified drag handle with just 2 lines -->
+                    <div class="drag-handle">
+                      <!-- The lines are created with CSS pseudo-elements -->
+                    </div>
+                    <div class="workout-info">
+                      <!-- Exercise Image/GIF -->
+                      <img [src]="getExerciseThumbnail(exercise.exercise_id)"
+                        alt="{{ getExerciseName(exercise.exercise_id) }}" class="exercise-img"
+                        (error)="handleImageError($event)">
+                        <div class="exercise-text">
+                          <span class="workout-name">{{ getExerciseName(exercise.exercise_id) }}</span>
+                          @if (exercise?.sets?.length) {
+                            <span class="set-preview">
+                              {{ (exercise.sets?.length ?? 0) }} {{ (exercise.sets?.length ?? 0) === 1 ? 'set'
+                              : 'sets' }} •
+                              {{ getSetsPreview(exercise) }}
+                            </span>
+                          }
+                        </div>
+                      </div>
+                      <!-- Exercise Menu -->
+                      <div class="menu-container">
+                        <button class="btn btn-icon menu-toggle"
+                          (click)="toggleWorkoutMenu(exercise.id, $event); $event.stopPropagation()">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                        </button>
+                        @if (menuOpenMap[exercise.id]) {
+                          <div class="menu-dropdown"
+                            (click)="$event.stopPropagation()">
+                            <button class="menu-item" (click)="editTemplateExercise(exercise)">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg> Edit
+                            </button>
+                            <button class="menu-item delete-item"
+                              (click)="deleteTemplateExercise(getDayTemplate(day).id, exercise.id)">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg> Delete
+                            </button>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+                } @else {
+                      <div class="day-empty-state">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>
+                    <p>No exercises yet</p>
+                  </div>
+                }
+                <!-- Empty State Template -->
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Day Zoom Overlay -->
+    @if (zoomedDay) {
+      <div class="day-zoom-overlay" (click)="closeDayZoom()">
+        <div class="day-zoom-container" (click)="$event.stopPropagation()">
+          <div class="day-zoom-header" [ngClass]="{'today': isToday(zoomedDay)}">
+            <div class="day-header-content">
+              <h2>{{ zoomedDay }} Exercises</h2>
+              @if (dayNotes[zoomedDay]) {
+                <div class="day-note">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z"/><path d="M15 3v4a2 2 0 0 0 2 2h4"/></svg>
+                  <span>{{ dayNotes[zoomedDay] }}</span>
+                </div>
+              }
+            </div>
+            <div class="zoom-header-actions">
+              <button class="btn btn-primary add-exercise-zoom-btn"
+                (click)="addExerciseToTemplate(getDayTemplate(zoomedDay)); $event.stopPropagation()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg> Add Exercise
+              </button>
+              <button class="close-zoom-btn" (click)="closeDayZoom()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="day-zoom-content">
+            <!-- Exercises List for Zoomed Day -->
+            <div class="workout-list">
+              @for (exercise of getExercisesForDay(zoomedDay); track exercise) {
+                <div class="workout-card"
+                  (click)="openExerciseDetail(exercise)">
+                  <!-- Simplified drag handle with just 2 lines -->
+                  <div class="drag-handle">
+                    <!-- The lines are created with CSS pseudo-elements -->
+                  </div>
+                  <div class="workout-info">
+                    <!-- Exercise Image/GIF -->
+                    <img [src]="getExerciseThumbnail(exercise.exercise_id)"
+                      alt="{{ getExerciseName(exercise.exercise_id) }}" class="exercise-img"
+                      (error)="handleImageError($event)">
+                      <div class="exercise-text">
+                        <span class="workout-name">{{ getExerciseName(exercise.exercise_id) }}</span>
+                        @if (exercise?.sets?.length) {
+                          <span class="set-preview">
+                            {{ (exercise.sets?.length ?? 0) }} {{ (exercise.sets?.length ?? 0) === 1 ? 'set' :
+                            'sets' }} •
+                            {{ getSetsPreview(exercise) }}
+                          </span>
+                        }
+                      </div>
+                    </div>
+                    <!-- Exercise Menu -->
+                    <div class="menu-container">
+                      <button class="btn btn-icon menu-toggle"
+                        (click)="toggleWorkoutMenu(exercise.id, $event); $event.stopPropagation()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                      </button>
+                      @if (menuOpenMap[exercise.id]) {
+                        <div class="menu-dropdown"
+                          (click)="$event.stopPropagation()">
+                          <button class="menu-item" (click)="editTemplateExercise(exercise)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg> Edit
+                          </button>
+                          <button class="menu-item delete-item"
+                            (click)="deleteTemplateExercise(getDayTemplate(zoomedDay).id, exercise.id)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg> Delete
+                          </button>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Exercise Detail Zoom Overlay -->
+      @if (zoomedExercise) {
+        <div class="exercise-zoom-overlay" (click)="closeExerciseDetail()">
+          <div class="exercise-zoom-container" (click)="$event.stopPropagation()">
+            <div class="exercise-zoom-header">
+              <h2>{{ getExerciseName(zoomedExercise.exercise_id) }}</h2>
+              <button class="close-zoom-btn" (click)="closeExerciseDetail()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              </button>
+            </div>
+            <!-- Exercise Image/GIF -->
+            <div class="exercise-detail-image-container">
+              <img [src]="getExerciseFullImage(zoomedExercise.exercise_id)" alt="Exercise"
+                class="exercise-detail-image" (error)="handleImageError($event)">
+              </div>
+              <div class="exercise-zoom-content-scrollable">
+                <!-- Instructions -->
+                <div class="exercise-description">
+                  <span>Instructions</span>
+                  @if (getExerciseInstructions(zoomedExercise.exercise_id); as instructions) {
+                    @for (sentence of formatInstructions(instructions); track sentence) {
+                      @if (sentence.isTip) {
+                        <div class="tip">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+                          <div class="tip-text">{{ sentence.text }}</div>
+                        </div>
+                      } @else {
+                        <div class="sentence">{{ sentence.text }}</div>
+                      }
+                    }
+                  }
+                </div>
+                <!-- Exercise Sets -->
+                @if (zoomedExercise && zoomedExercise.sets && zoomedExercise.sets.length) {
+                  <div class="sets-container">
+                    <div class="sets-header">
+                      <span>Sets</span>
+                      <span>{{ zoomedExercise.sets.length || 0 }} total</span>
+                    </div>
+                    <div class="sets-list">
+                      @for (set of zoomedExercise.sets; track set; let i = $index) {
+                        <div class="set-card">
+                          <span class="set-number">Set {{ i + 1 }}</span>
+                          <span class="set-info">{{ set.reps }} reps • {{ set.weight }} {{ set.weightUnit }}</span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Exercise Modal -->
+        <app-exercise-modal [isOpen]="isExerciseModalOpen" [selectedTemplate]="selectedTemplate"
+          [templateExercises]="templateExercises" (close)="closeExerciseModal()" (save)="saveTemplateExercises($event)">
+        </app-exercise-modal>
+      </div>
+
+      <!-- Active Workout Session Overlay -->
+      @if (activeWorkoutDay) {
+        <div class="workout-session-overlay" [class.minimized]="workoutSessionMinimized">
+          <div class="workout-session-container">
+            <!-- Header with timer and controls -->
+            <div class="workout-session-header">
+              <div class="workout-session-info">
+                <h2>{{ activeWorkoutDay }} Workout</h2>
+                <div class="workout-timer">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  <span class="timer">{{ formatWorkoutTime(workoutElapsedTime) }}</span>
+                </div>
+              </div>
+              <div class="workout-session-controls">
+                <button class="btn btn-minimize" (click)="minimizeWorkoutSession()" title="Minimize">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
+                </button>
+                <button class="btn btn-finish" (click)="confirmFinishWorkout()">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Finish
+                </button>
+              </div>
+            </div>
+            <!-- Workout Content -->
+            <div class="workout-session-content">
+              <!-- Exercises List -->
+              <div class="workout-session-exercises">
+                @for (exercise of getExercisesForDay(activeWorkoutDay); track exercise; let i = $index) {
+                  <div
+                    class="workout-session-exercise"
+                    [class.completed]="exerciseCompletionStatus[exercise.id]">
+                    <div class="exercise-session-header">
+                      <div class="exercise-session-info">
+                        <img [src]="getExerciseThumbnail(exercise.exercise_id)"
+                          alt="{{ getExerciseName(exercise.exercise_id) }}"
+                          class="exercise-session-img"
+                          (error)="handleImageError($event)">
+                          <div>
+                            <span class="exercise-session-name">{{ getExerciseName(exercise.exercise_id) }}</span>
+                            <span class="exercise-session-sets">{{ (exercise.sets?.length ?? 0) }} sets</span>
+                          </div>
+                        </div>
+                        <button class="btn btn-toggle-complete"
+                          (click)="toggleExerciseCompletion(exercise.id)">
+                          @if (exerciseCompletionStatus[exercise.id]) {
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                          } @else {
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>
+                          }
+                        </button>
+                      </div>
+                      <!-- Sets for this exercise -->
+                      @if (!exerciseCompletionStatus[exercise.id]) {
+                        <div class="exercise-session-sets-list">
+                          @for (set of exercise.sets; track set; let j = $index) {
+                            <div class="exercise-session-set"
+                              [class.completed]="setCompletionStatus[exercise.id + '-' + j]">
+                              <span class="set-number">Set {{ j + 1 }}</span>
+                              <span class="set-details">{{ set.reps }} reps • {{ set.weight }} {{ set.weightUnit }}</span>
+                              <button class="btn btn-complete-set" (click)="toggleSetCompletion(exercise.id, j)">
+                                @if (setCompletionStatus[exercise.id + '-' + j]) {
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                } @else {
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>
+                                }
+                              </button>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+                <!-- Rest Timer Section -->
+                <div class="rest-timer-section">
+                  @if (restTimerActive) {
+                    <div class="rest-timer-display">
+                      <div class="rest-timer-circle">
+                        <svg viewBox="0 0 100 100" class="rest-timer-progress">
+                          <circle cx="50" cy="50" r="45" class="rest-timer-base" />
+                          <circle cx="50" cy="50" r="45" [style.stroke-dashoffset]="getRestTimerProgress()"
+                            class="rest-timer-elapsed" />
+                          </svg>
+                          <div class="rest-timer-text">{{ formatRestTime(restTimeRemaining) }}</div>
+                        </div>
+                        <button class="btn btn-cancel-rest" (click)="cancelRestTimer()">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg> Skip
+                        </button>
+                      </div>
+                    }
+                    @if (!restTimerActive) {
+                      <div class="rest-timer-buttons">
+                        <button class="btn btn-rest" (click)="startRestTimer(30)">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 30s
+                        </button>
+                        <button class="btn btn-rest" (click)="startRestTimer(60)">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 1m
+                        </button>
+                        <button class="btn btn-rest" (click)="startRestTimer(120)">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 2m
+                        </button>
+                        <button class="btn btn-rest" (click)="startRestTimer(180)">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 3m
+                        </button>
+                        <button class="btn btn-rest" (click)="startRestTimer(300)">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 5m
+                        </button>
+                        <button class="btn btn-custom-rest" (click)="promptCustomRestTimer()">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Custom
+                        </button>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Minimized Workout Indicator - move outside the overlay so it's always visible when minimized -->
+          @if (activeWorkoutDay && workoutSessionMinimized) {
+            <div class="minimized-workout-indicator" (click)="maximizeWorkoutSession()">
+              <div class="minimized-workout-info">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>
+                <span>{{ activeWorkoutDay }} - {{ formatWorkoutTime(workoutElapsedTime) }}</span>
+              </div>
+              <button class="btn btn-finish-mini" (click)="confirmFinishWorkout(); $event.stopPropagation()" title="Finish Workout">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </button>
+            </div>
+          }
+
+          <!-- Workout Completion Modal -->
+          @if (showWorkoutCompletionModal) {
+            <div class="workout-completion-modal">
+              <div class="workout-completion-container">
+                <div class="completion-header">
+                  <h2>Workout Complete!</h2>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+                </div>
+                <div class="completion-stats">
+                  <div class="stat-item">
+                    <span class="stat-label">Duration</span>
+                    <span class="stat-value">{{ formatWorkoutTime(workoutElapsedTime) }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">Exercises</span>
+                    <span class="stat-value">{{ getCompletedExercisesCount() }}/{{ getTotalExercisesCount() }}</span>
+                  </div>
+                </div>
+                <div class="completion-actions">
+                  <button class="btn btn-primary btn-lg" (click)="finishWorkout()">Done</button>
+                </div>
+              </div>
+            </div>
+          }

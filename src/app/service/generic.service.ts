@@ -31,7 +31,8 @@ export class GenericService<T> {
   create(endpoint: string, data: T): Observable<T> {
     const headers = this.getHeaders()
       .set('Content-Type', 'application/json')
-      .set('Prefer', 'return=representation'); // Ensure the server returns the created record
+      .set('Accept', 'application/vnd.pgrst.object+json')
+      .set('Prefer', 'return=representation');
     return this.http.post<T>(`${this.baseUrl}/${endpoint}`, data, { headers });
   }
   updateById(endpoint: string, id: number, data: T): Observable<T> {

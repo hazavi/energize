@@ -1,126 +1,103 @@
-<!-- exercises.component.html -->
-<div class="exercises-container">
-
-  <!-- Header -->
-  <div class="gymvisual-header">
-    <h2 class="gymvisual-title">
-      <i class="fas fa-dumbbell"></i>
-      Exercise Catalog
-    </h2>
-    <span class="gymvisual-count">{{ totalItems }} exercises</span>
-  </div>
-
-  <!-- Search + Filters -->
-  <div class="search-filter-container">
-    <div class="search-bar">
-      <i class="fas fa-search search-icon"></i>
-      <input type="text" [(ngModel)]="searchTerm" placeholder="Search exercises..."
-        class="search-input" (input)="applyFilters()">
-    </div>
-    <button class="clear-filters-btn" (click)="clearFilters()" [disabled]="!hasActiveFilters">
-      <i class="fas fa-times"></i> Clear
-    </button>
-  </div>
-
-  <!-- Filter Dropdowns -->
-  <div class="gymvisual-filters">
-    <div class="gv-filter-group">
-      <span class="gv-filter-label">Exercise Type</span>
-      <select class="gv-select" [(ngModel)]="selectedExerciseType" (change)="applyFilters()">
-        <option value="">All</option>
-        @for (opt of exerciseTypeOptions; track opt) {
-          <option [value]="opt">{{ opt }}</option>
-        }
-      </select>
-    </div>
-    <div class="gv-filter-group">
-      <span class="gv-filter-label">Body Part</span>
-      <select class="gv-select" [(ngModel)]="selectedBodyPart" (change)="applyFilters()">
-        <option value="">All</option>
-        @for (opt of bodyPartOptions; track opt) {
-          <option [value]="opt">{{ opt }}</option>
-        }
-      </select>
-    </div>
-    <div class="gv-filter-group">
-      <span class="gv-filter-label">Equipment</span>
-      <select class="gv-select" [(ngModel)]="selectedEquipment" (change)="applyFilters()">
-        <option value="">All</option>
-        @for (opt of equipmentOptions; track opt) {
-          <option [value]="opt">{{ opt }}</option>
-        }
-      </select>
-    </div>
-  </div>
-
-  <!-- Loading -->
+﻿<div class="exercises-container">
   @if (isLoading) {
-    <div class="loading-container">
-      <div class="spinner"></div>
-      <p>Loading exercises...</p>
+    <div class="empty-state">
+      <p>Loading exercises…</p>
     </div>
   }
 
-  <!-- Exercise Grid -->
-  @if (!isLoading && paginatedExercises.length > 0) {
-    <div class="gymvisual-grid">
+  @if (!isLoading) {
+    <!-- Header + Inline Filters -->
+    <div class="exercises-header">
+      <h2 class="section-title">Exercise Catalog</h2>
+      <span class="result-count">{{ filteredExercises.length }} exercises</span>
+    </div>
+
+    <div class="filter-bar">
+      <div class="search-input-wrap">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" placeholder="Search exercises…" [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()" class="search-input" />
+      </div>
+
+      <select class="filter-select" [(ngModel)]="selectedExerciseType" (ngModelChange)="applyFilters()">
+        <option value="">All Types</option>
+        @for (type of exerciseTypeOptions; track type) {
+          <option [value]="type">{{ type }}</option>
+        }
+      </select>
+
+      <select class="filter-select" [(ngModel)]="selectedBodyPart" (ngModelChange)="applyFilters()">
+        <option value="">All Body Parts</option>
+        @for (part of bodyPartOptions; track part) {
+          <option [value]="part">{{ part }}</option>
+        }
+      </select>
+
+      <select class="filter-select" [(ngModel)]="selectedEquipment" (ngModelChange)="applyFilters()">
+        <option value="">All Equipment</option>
+        @for (eq of equipmentOptions; track eq) {
+          <option [value]="eq">{{ eq }}</option>
+        }
+      </select>
+
+      @if (hasActiveFilters) {
+        <button class="btn-clear" (click)="clearFilters()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          Clear
+        </button>
+      }
+    </div>
+
+    <!-- Exercise Grid -->
+    <div class="exercise-grid">
       @for (exercise of paginatedExercises; track exercise.id) {
-        <div class="gv-card" (click)="navigateToExercise(exercise.id)">
-          <div class="gv-thumbnail">
+        <div class="exercise-card" (click)="navigateToExercise(exercise.id)">
+          <div class="card-thumbnail">
             <canvas class="gv-frozen"></canvas>
             <img [src]="exercise.gif_url" [alt]="exercise.name" class="gv-gif"
               (load)="freezeGif($event)" (error)="handleImageError($event)" loading="lazy" />
           </div>
-          <div class="gv-details">
-            <h4 class="gv-name" [title]="exercise.name">{{ exercise.name }}</h4>
-            <div class="gv-tags">
+          <div class="card-body">
+            <h3 class="card-title">{{ exercise.name }}</h3>
+            <div class="card-tags">
               @if (exercise.exercise_type) {
-                <span class="gv-tag type">{{ exercise.exercise_type }}</span>
+                <span class="tag tag-type">{{ exercise.exercise_type }}</span>
               }
-              @if (exercise.body_part.length) {
-                <span class="gv-tag body">{{ exercise.body_part[0] }}</span>
-              }
-              @if (exercise.equipment.length) {
-                <span class="gv-tag equip">{{ exercise.equipment[0] }}</span>
+              @for (bp of exercise.body_part | slice:0:2; track bp) {
+                <span class="tag tag-body">{{ bp }}</span>
               }
             </div>
           </div>
         </div>
       }
     </div>
-  } @else if (!isLoading && filteredExercises.length === 0) {
-    <div class="no-exercises">
-      <i class="fas fa-search empty-icon"></i>
-      <p>No exercises found matching your filters.</p>
-      <button class="clear-filters-btn" (click)="clearFilters()">Clear Filters</button>
-    </div>
-  }
 
-  <!-- Pagination -->
-  @if (totalPages > 1) {
-    <div class="pagination-controls">
-      <button class="pagination-btn prev" (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">
-        <i class="fas fa-chevron-left"></i>
-      </button>
-      <div class="pagination-numbers">
+    <!-- Empty state -->
+    @if (filteredExercises.length === 0) {
+      <div class="empty-state">
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <p>No exercises found</p>
+        <button class="btn-clear" (click)="clearFilters()">Clear filters</button>
+      </div>
+    }
+
+    <!-- Pagination -->
+    @if (totalPages > 1) {
+      <nav class="pagination">
+        <button class="page-btn" [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
         @for (page of getDisplayedPageNumbers(); track page) {
-          @if (page !== -1) {
-            <button class="page-number" [class.active]="page === currentPage" (click)="changePage(page)">
-              {{ page }}
-            </button>
+          @if (page === -1) {
+            <span class="page-ellipsis">…</span>
           } @else {
-            <span class="ellipsis">•••</span>
+            <button class="page-btn" [class.active]="page === currentPage" (click)="changePage(page)">{{ page }}</button>
           }
         }
-      </div>
-      <button class="pagination-btn next" (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">
-        <i class="fas fa-chevron-right"></i>
-      </button>
-    </div>
-
-    <!-- Item Count -->
-    <div class="gymvisual-product-count">
-      Showing {{ ((currentPage - 1) * pageSize) + 1 }} – {{ currentPage * pageSize > totalItems ? totalItems : currentPage * pageSize }} of {{ totalItems }} exercises
-    </div>
+        <button class="page-btn" [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </nav>
+    }
   }
 </div>
+

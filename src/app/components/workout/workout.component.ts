@@ -91,6 +91,8 @@ export class WorkoutComponent implements OnInit, AfterViewInit {
   // Add these properties to your component
   dayMenuOpen: { [day: string]: boolean } = {};
   dayNotes: { [day: string]: string } = {};
+  editingNoteDay: string | null = null;
+  editingNoteText: string = '';
 
   // Add these properties to the component class
   // Rest Day tracking
@@ -161,16 +163,12 @@ export class WorkoutComponent implements OnInit, AfterViewInit {
     this.restoreWorkoutSession();
   }
   loadExercises(): void {
-    this.isLoading = true;
-
     this.genericService.getAll('exercises', { range: '0-9999' }).subscribe({
       next: (data: CatalogExercise[]) => {
         this.exercises = data;
-        this.isLoading = false;
       },
       error: (err) => {
         console.error('Error fetching exercises:', err);
-        this.isLoading = false;
       },
     });
   }
@@ -182,15 +180,11 @@ export class WorkoutComponent implements OnInit, AfterViewInit {
 
     this.isLoading = true;
 
-    // Filter templates by user_uid
     this.genericService
       .getAll(`template?user_uid=eq.${this.user.userId}`)
-      .subscribe(
-        (templates: Template[]) => {
-          // Check if we already have templates for each day
+      .subscribe({
+        next: (templates: Template[]) => {
           const existingDays = new Set(templates.map((t) => t.name));
-
-          // Create templates for missing days
           const templatesToCreate = this.weekDays.filter(
             (day) => !existingDays.has(day)
           );
@@ -201,11 +195,15 @@ export class WorkoutComponent implements OnInit, AfterViewInit {
             this.setupTemplates(templates);
           }
         },
-        (error) => {
+        error: (error) => {
           console.error('Error loading templates:', error);
+          // Tables might not exist yet - show empty state instead of error
           this.isLoading = false;
-        }
-      );
+          if (error.status === 404) {
+            this.notificationService.warning('Database tables not set up yet. Please run the migration SQL in your Supabase Dashboard.');
+          }
+        },
+      });
   }
 
   private createDayTemplates(
@@ -232,12 +230,17 @@ export class WorkoutComponent implements OnInit, AfterViewInit {
     // Wait for all templates to be created
     Promise.all(promises)
       .then((newTemplates) => {
-        const allTemplates = [...existingTemplates, ...newTemplates];
+        const allTemplates = [...existingTemplates, ...newTemplates.filter(Boolean)];
         this.setupTemplates(allTemplates);
       })
       .catch((error) => {
         console.error('Error creating day templates:', error);
-        this.isLoading = false;
+        // Still set up whatever templates already exist
+        if (existingTemplates.length > 0) {
+          this.setupTemplates(existingTemplates);
+        } else {
+          this.isLoading = false;
+        }
       });
   }
 
@@ -358,12 +361,26 @@ export class WorkoutComponent implements OnInit, AfterViewInit {
     }
   }
 
-  addExerciseToTemplate(template: Template): void {
-    if (!template) {
-      alert('Template not found.');
+  addExerciseToTemplate(template: Template, day?: string): void {
+    if (!template && day) {
+      // Template not loaded yet — create it on the fly
+      this.createTemplateForDay(day).then((newTemplate) => {
+        if (newTemplate) {
+          this.openExerciseModalForTemplate(newTemplate);
+        } else {
+          this.notificationService.error('Failed to create template. Please reload the page.');
+        }
+      });
       return;
     }
+    if (!template) {
+      this.notificationService.error('Template not available. Please reload the page.');
+      return;
+    }
+    this.openExerciseModalForTemplate(template);
+  }
 
+  private openExerciseModalForTemplate(template: Template): void {
     const currentExerciseCount =
       this.templateExercisesMap[template.id]?.length || 0;
 
@@ -377,6 +394,56 @@ export class WorkoutComponent implements OnInit, AfterViewInit {
     this.selectedTemplate = template;
     this.templateExercises = [];
     this.isExerciseModalOpen = true;
+  }
+
+  private createTemplateForDay(day: string): Promise<Template | null> {
+    if (!this.user) return Promise.resolve(null);
+
+    // First try to find an existing template for this day
+    return new Promise((resolve) => {
+      this.genericService
+        .getAll(`template?user_uid=eq.${this.user!.userId}&name=eq.${day}`)
+        .subscribe({
+          next: (existing: any[]) => {
+            if (existing && existing.length > 0) {
+              const template = existing[0] as Template;
+              this.dayTemplateMap[day] = template;
+              if (!this.templates.find((t) => t.id === template.id)) {
+                this.templates.push(template);
+              }
+              this.templateExercisesMap[template.id] = this.templateExercisesMap[template.id] || [];
+              this.workoutsMap[template.id] = this.workoutsMap[template.id] || [];
+              this.loadTemplateExercises(template.id);
+              resolve(template);
+            } else {
+              // Create new template
+              const newTemplate: any = {
+                name: day,
+                description: `${day} workout plan`,
+                workout_id: null,
+                user_uid: this.user!.userId,
+              };
+              this.genericService.create('template', newTemplate).subscribe({
+                next: (template: any) => {
+                  this.dayTemplateMap[day] = template;
+                  this.templates.push(template);
+                  this.templateExercisesMap[template.id] = [];
+                  this.workoutsMap[template.id] = [];
+                  resolve(template);
+                },
+                error: (err) => {
+                  console.error('Error creating template for', day, err);
+                  resolve(null);
+                },
+              });
+            }
+          },
+          error: (err) => {
+            console.error('Error looking up template for', day, err);
+            resolve(null);
+          },
+        });
+    });
   }
 
   closeExerciseModal(): void {
@@ -461,19 +528,15 @@ export class WorkoutComponent implements OnInit, AfterViewInit {
     // Wait for all operations to complete
     Promise.all([...updatePromises, ...createPromises])
       .then((exercises) => {
-        // Display success message
         this.notificationService.success(
           `Successfully ${newExercises.length > 0 ? 'added' : 'updated'} exercises to template`
         );
         
-        // Close the modal
         this.isExerciseModalOpen = false;
         this.selectedTemplate = null;
         
-        // Refresh page to show new exercises
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
+        // Refresh template exercises from the server instead of reloading
+        this.loadTemplateExercises(templateId);
       })
       .catch((error) => {
         console.error('Error saving template exercises:', error);
@@ -485,19 +548,28 @@ export class WorkoutComponent implements OnInit, AfterViewInit {
       });
   }
 
+  deleteConfirmId: number | null = null;
+
   deleteTemplateExercise(templateId: number, exerciseId: number): void {
-    if (confirm('Are you sure you want to remove this exercise?')) {
-      this.genericService.deleteById('templateexercise', exerciseId).subscribe(
-        () => {
-          this.templateExercisesMap[templateId] = this.templateExercisesMap[
-            templateId
-          ].filter((e) => e.id !== exerciseId);
-        },
-        (error) => {
-          console.error('Error deleting template exercise:', error);
-        }
-      );
+    if (this.deleteConfirmId !== exerciseId) {
+      this.deleteConfirmId = exerciseId;
+      return;
     }
+    
+    this.deleteConfirmId = null;
+    this.genericService.deleteById('templateexercise', exerciseId).subscribe({
+      next: () => {
+        this.templateExercisesMap[templateId] = this.templateExercisesMap[
+          templateId
+        ].filter((e) => e.id !== exerciseId);
+        this.menuOpenMap[exerciseId] = false;
+        this.notificationService.success('Exercise removed');
+      },
+      error: (error) => {
+        console.error('Error deleting template exercise:', error);
+        this.notificationService.error('Failed to remove exercise');
+      },
+    });
   }
 
   openDayZoom(day: string): void {
@@ -541,9 +613,8 @@ export class WorkoutComponent implements OnInit, AfterViewInit {
   getSetsPreview(exercise: TemplateExercise): string {
     if (!exercise.sets || exercise.sets.length === 0) return '';
 
-    // Just show the first set as a preview
     const firstSet = exercise.sets[0];
-    return `${(firstSet.reps, firstSet.weight)} ${firstSet.weightUnit}`;
+    return `${firstSet.reps} × ${firstSet.weight} ${firstSet.weightUnit}`;
   }
 
   @HostListener('document:click', ['$event'])
@@ -745,7 +816,7 @@ export class WorkoutComponent implements OnInit, AfterViewInit {
     if (!this.zoomedDay) return;
 
     const zoomedExerciseList = document.querySelector(
-      '.day-zoom-content .workout-list'
+      '.overlay-body .workout-list'
     ) as HTMLElement;
     if (!zoomedExerciseList) return;
 
@@ -900,21 +971,29 @@ export class WorkoutComponent implements OnInit, AfterViewInit {
 
   // Edit day note
   editDayNote(day: string): void {
-    const currentNote = this.dayNotes[day] || '';
-    const newNote = prompt('Enter a note for ' + day + ':', currentNote);
+    this.editingNoteDay = day;
+    this.editingNoteText = this.dayNotes[day] || '';
+    this.dayMenuOpen[day] = false;
+  }
 
-    if (newNote !== null) {
-      if (newNote.trim() === '') {
-        // Remove note if empty
-        delete this.dayNotes[day];
-      } else {
-        // Save note
-        this.dayNotes[day] = newNote.trim();
-      }
-
-      // Save to localStorage
-      localStorage.setItem('dayNotes', JSON.stringify(this.dayNotes));
+  saveDayNote(): void {
+    if (!this.editingNoteDay) return;
+    
+    const text = this.editingNoteText.trim();
+    if (text === '') {
+      delete this.dayNotes[this.editingNoteDay];
+    } else {
+      this.dayNotes[this.editingNoteDay] = text;
     }
+    
+    localStorage.setItem('dayNotes', JSON.stringify(this.dayNotes));
+    this.editingNoteDay = null;
+    this.editingNoteText = '';
+  }
+
+  cancelDayNote(): void {
+    this.editingNoteDay = null;
+    this.editingNoteText = '';
   }
 
   private setupHoverScroll(): void {
@@ -1216,16 +1295,22 @@ export class WorkoutComponent implements OnInit, AfterViewInit {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   }
   
+  showCustomTimerInput: boolean = false;
+  customTimerValue: string = '';
+
   promptCustomRestTimer(): void {
-    const seconds = prompt('Enter rest time in seconds:');
-    if (seconds === null) return;
-    
-    const secondsNum = parseInt(seconds, 10);
+    this.showCustomTimerInput = !this.showCustomTimerInput;
+    this.customTimerValue = '';
+  }
+
+  submitCustomTimer(): void {
+    const secondsNum = parseInt(this.customTimerValue, 10);
     if (isNaN(secondsNum) || secondsNum <= 0) {
       this.notificationService.warning('Please enter a valid positive number.');
       return;
     }
-    
+    this.showCustomTimerInput = false;
+    this.customTimerValue = '';
     this.startRestTimer(secondsNum);
   }
   
